@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "134549228112",
+    "project_id": "smart-shouhi",
+    "storage_bucket": "smart-shouhi.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:134549228112:android:57dc8dc661469d46db5f55",
+        "android_client_info": {
+          "package_name": "com.dl.smartshouhi"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "134549228112-uhes1eesp5ka0co1e1kb26hb77nr6d68.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.dl.smartshouhi",
+            "certificate_hash": "a9418a0940f670205fc3cb58b8dc33d716e601bb"
+          }
+        },
+        {
+          "client_id": "134549228112-ktn8tbb8596qculclnorvq7o6gktvrb6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDU3c8_7fIscCXmKiSXxdS3Of5pNy5NET8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "134549228112-ktn8tbb8596qculclnorvq7o6gktvrb6.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
