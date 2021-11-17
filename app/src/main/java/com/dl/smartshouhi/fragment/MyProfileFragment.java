@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -34,7 +35,8 @@ public class MyProfileFragment extends Fragment {
     private View mView;
 
     private ImageView imgAvatar;
-    private EditText edtFullName, edtEmail;
+    private EditText edtFullName;
+    private TextView tvEmail;
     private Button btnUpdateProfile;
     private Uri mUri;
     private MainActivity mainActivity;
@@ -59,7 +61,7 @@ public class MyProfileFragment extends Fragment {
     private void initUI(){
         imgAvatar = mView.findViewById(R.id.img_avatar);
         edtFullName = mView.findViewById(R.id.edt_fullname);
-        edtEmail = mView.findViewById(R.id.edt_email);
+        tvEmail = mView.findViewById(R.id.tv_email);
         btnUpdateProfile = mView.findViewById(R.id.btn_update_profile);
     }
 
@@ -68,9 +70,10 @@ public class MyProfileFragment extends Fragment {
         if(user == null){
             return;
         }
+        Toast.makeText(getActivity(),user.getDisplayName(),Toast.LENGTH_LONG).show();
 
         edtFullName.setText(user.getDisplayName());
-        edtEmail.setText(user.getEmail());
+        tvEmail.setText(user.getEmail());
         Glide.with(getActivity()).load(user.getPhotoUrl()).error(R.drawable.ic_avatar_default);
     }
 
@@ -110,7 +113,10 @@ public class MyProfileFragment extends Fragment {
         }
     }
     public void setBitmapImageView(Bitmap bitmapImageView){
-        imgAvatar.setImageBitmap(bitmapImageView);
+        Toast.makeText(getActivity(), bitmapImageView.getGenerationId()+"", Toast.LENGTH_LONG).show();
+        if(bitmapImageView != null){
+            imgAvatar.setImageBitmap(bitmapImageView);
+        }
     }
 
     public void setUri(Uri mUri) {
@@ -123,6 +129,7 @@ public class MyProfileFragment extends Fragment {
         if(user == null){
             return;
         }
+
         progressDialog.show();
         String strFullName = edtFullName.getText().toString().trim();
         UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()

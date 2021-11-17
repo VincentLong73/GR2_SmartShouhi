@@ -21,13 +21,14 @@
         android:layout_marginTop="30dp"
         android:hint="Full Name"/>
 
-    <EditText
-        android:id="@+id/edt_email"
+    <TextView
+        android:id="@+id/tv_email"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="10dp"
+        android:textColor="@color/purple_700"
         android:layout_marginTop="30dp"
-        android:hint="Email"/>
+        />
     <Button
         android:id="@+id/btn_update_profile"
         android:layout_width="match_parent"
