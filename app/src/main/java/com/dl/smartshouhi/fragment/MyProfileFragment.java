@@ -7,6 +7,7 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,8 +24,6 @@ import androidx.fragment.app.Fragment;
 import com.bumptech.glide.Glide;
 import com.dl.smartshouhi.R;
 import com.dl.smartshouhi.activities.MainActivity;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
@@ -32,6 +31,7 @@ import com.google.firebase.auth.UserProfileChangeRequest;
 public class MyProfileFragment extends Fragment {
 
     public static final int MY_REQUEST_CODE = 311;
+    private static final String TAG_IMAGE = "TAG_IMAGE";
     private View mView;
 
     private ImageView imgAvatar;
@@ -59,7 +59,7 @@ public class MyProfileFragment extends Fragment {
     }
 
     private void initUI(){
-        imgAvatar = mView.findViewById(R.id.img_avatar);
+        imgAvatar = mView.findViewById(R.id.img_avatar_fragment_profile);
         edtFullName = mView.findViewById(R.id.edt_fullname);
         tvEmail = mView.findViewById(R.id.tv_email);
         btnUpdateProfile = mView.findViewById(R.id.btn_update_profile);
@@ -70,29 +70,20 @@ public class MyProfileFragment extends Fragment {
         if(user == null){
             return;
         }
-        Toast.makeText(getActivity(),user.getDisplayName(),Toast.LENGTH_LONG).show();
+        Toast.makeText(getActivity(),"Hi "+user.getDisplayName(),Toast.LENGTH_LONG).show();
 
         edtFullName.setText(user.getDisplayName());
         tvEmail.setText(user.getEmail());
-        Glide.with(getActivity()).load(user.getPhotoUrl()).error(R.drawable.ic_avatar_default);
+        Log.e(TAG_IMAGE, user.getPhotoUrl()+"");
+        Glide.with(getActivity()).load(user.getPhotoUrl()).error(R.drawable.ic_avatar_default).into(imgAvatar);
     }
 
 
     private void initListener() {
 
-        imgAvatar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onClickRequestPermission();
-            }
-        });
+        imgAvatar.setOnClickListener(v -> onClickRequestPermission());
 
-        btnUpdateProfile.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onClickUpdateProfile();
-            }
-        });
+        btnUpdateProfile.setOnClickListener(v -> onClickUpdateProfile());
     }
 
     private void onClickRequestPermission() {
@@ -113,10 +104,7 @@ public class MyProfileFragment extends Fragment {
         }
     }
     public void setBitmapImageView(Bitmap bitmapImageView){
-        Toast.makeText(getActivity(), bitmapImageView.getGenerationId()+"", Toast.LENGTH_LONG).show();
-        if(bitmapImageView != null){
-            imgAvatar.setImageBitmap(bitmapImageView);
-        }
+        imgAvatar.setImageBitmap(bitmapImageView);
     }
 
     public void setUri(Uri mUri) {
@@ -138,14 +126,11 @@ public class MyProfileFragment extends Fragment {
                 .build();
 
         user.updateProfile(profileUpdates)
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        progressDialog.dismiss();
-                        if (task.isSuccessful()) {
-                            Toast.makeText(getActivity(), "Update Profile Success", Toast.LENGTH_LONG).show();
-                            mainActivity.showUserInformation();
-                        }
+                .addOnCompleteListener(task -> {
+                    progressDialog.dismiss();
+                    if (task.isSuccessful()) {
+                        Toast.makeText(getActivity(), "Update Profile Success", Toast.LENGTH_LONG).show();
+                        mainActivity.showUserInformation();
                     }
                 });
     }

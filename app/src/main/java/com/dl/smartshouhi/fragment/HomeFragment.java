@@ -102,7 +102,7 @@ public class HomeFragment extends Fragment {
     }
 
     private void onClickSendData(Invoice invoice) {
-        FirebaseDatabase database = FirebaseDatabase.getInstance("https://modulelogin-253a6-default-rtdb.asia-southeast1.firebasedatabase.app/");
+        FirebaseDatabase database = FirebaseDatabase.getInstance("https://smart-shouhi-default-rtdb.asia-southeast1.firebasedatabase.app/");
         DatabaseReference myRef = database.getReference("users/1/invoices");
 
 
@@ -118,7 +118,7 @@ public class HomeFragment extends Fragment {
     }
 
     private void getListInvoiceDatabase(){
-        FirebaseDatabase database = FirebaseDatabase.getInstance("https://modulelogin-253a6-default-rtdb.asia-southeast1.firebasedatabase.app/");
+        FirebaseDatabase database = FirebaseDatabase.getInstance("https://smart-shouhi-default-rtdb.asia-southeast1.firebasedatabase.app/");
         DatabaseReference myRef = database.getReference("users/0/invoices");
 
 //        myRef.addValueEventListener(new ValueEventListener() {
@@ -199,7 +199,7 @@ public class HomeFragment extends Fragment {
         btnUpdateSeller.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                FirebaseDatabase database = FirebaseDatabase.getInstance("https://modulelogin-253a6-default-rtdb.asia-southeast1.firebasedatabase.app/");
+                FirebaseDatabase database = FirebaseDatabase.getInstance("https://smart-shouhi-default-rtdb.asia-southeast1.firebasedatabase.app/");
                 DatabaseReference myRef = database.getReference("users/1/invoices");
 
                 String pathObject = "invoice-1";

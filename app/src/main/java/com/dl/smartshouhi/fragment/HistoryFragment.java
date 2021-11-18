@@ -123,7 +123,7 @@ public class HistoryFragment extends Fragment {
 
 
     private void getListInvoiceDatabase(){
-        FirebaseDatabase database = FirebaseDatabase.getInstance("https://modulelogin-253a6-default-rtdb.asia-southeast1.firebasedatabase.app/");
+        FirebaseDatabase database = FirebaseDatabase.getInstance("https://smart-shouhi-default-rtdb.asia-southeast1.firebasedatabase.app/");
         DatabaseReference myRef = database.getReference("users/1/invoices");
         myRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override

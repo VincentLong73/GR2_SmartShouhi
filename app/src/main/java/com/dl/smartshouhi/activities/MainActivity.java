@@ -6,13 +6,12 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import androidx.activity.result.ActivityResult;
-import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
@@ -30,6 +29,7 @@ import com.dl.smartshouhi.fragment.ChangePasswordFragment;
 import com.dl.smartshouhi.fragment.FavoriteFragment;
 import com.dl.smartshouhi.fragment.HistoryFragment;
 import com.dl.smartshouhi.fragment.HomeFragment;
+import com.dl.smartshouhi.fragment.InvoiceInformationFragment;
 import com.dl.smartshouhi.fragment.MyProfileFragment;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
@@ -44,6 +44,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private TextView tvName, tvEmail;
     private NavigationView mNavigationView;
     final private MyProfileFragment myProfileFragment = new MyProfileFragment();
+    final private InvoiceInformationFragment invoiceInformationFragment = new InvoiceInformationFragment();
 
     public static final int MY_REQUEST_CODE = 311;
     private static final int FRAGMENT_HOME = 0;
@@ -51,26 +52,36 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private static final int FRAGMENT_HISTORY = 2;
     private static final int FRAGMENT_PROFILE = 3;
     private static final int FRAGMENT_CHANGE_PASSWORD = 4;
+    private static final int FRAGMENT_INVOICE_INFORMATION = 5;
 
     private static int currentFragment = FRAGMENT_HOME;
 
+    private static final String TAG_IMAGE = "TAG_IMAGE";
+
     private final ActivityResultLauncher<Intent> mActivityResultLauncher = registerForActivityResult(
-            new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
-                @Override
-                public void onActivityResult(ActivityResult result) {
-                    if(result.getResultCode() == RESULT_OK){
-                        Intent intent = result.getData();
-                        if(intent == null){
-                            return;
-                        }
-                        Uri uri = intent.getData();
+            new ActivityResultContracts.StartActivityForResult(), result -> {
+                if(result.getResultCode() == RESULT_OK){
+                    Intent intent = result.getData();
+                    if(intent == null){
+                        return;
+                    }
+                    Uri uri = intent.getData();
+                    if(currentFragment == FRAGMENT_PROFILE){
                         myProfileFragment.setUri(uri);
-                        try {
-                            Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
+                    }else if(currentFragment == FRAGMENT_INVOICE_INFORMATION){
+                        invoiceInformationFragment.setUri(uri);
+                    }
+
+                    try {
+                        Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
+                        if(currentFragment == FRAGMENT_PROFILE){
                             myProfileFragment.setBitmapImageView(bitmap);
-                        } catch (IOException e) {
-                            e.printStackTrace();
+                        }else if(currentFragment == FRAGMENT_INVOICE_INFORMATION){
+                            invoiceInformationFragment.setBitmapImageView(bitmap);
                         }
+
+                    } catch (IOException e) {
+                        e.printStackTrace();
                     }
                 }
             }
@@ -126,6 +137,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             tvName.setText(name);
         }
         tvEmail.setText(email);
+        Log.e(TAG_IMAGE,user.getPhotoUrl()+"");
         Glide.with(this).load(photoUri).error(R.drawable.ic_avatar_default).into(imgAvatar);
     }
 
@@ -166,6 +178,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             if(currentFragment != FRAGMENT_CHANGE_PASSWORD){
                 replaceFragment(new ChangePasswordFragment());
                 currentFragment = FRAGMENT_CHANGE_PASSWORD;
+            }
+        }else if(id == R.id.nav_post_add){
+            if(currentFragment != FRAGMENT_INVOICE_INFORMATION){
+                replaceFragment(invoiceInformationFragment);
+                currentFragment = FRAGMENT_INVOICE_INFORMATION;
             }
         }else if(id == R.id.nav_sign_out){
             FirebaseAuth.getInstance().signOut();
