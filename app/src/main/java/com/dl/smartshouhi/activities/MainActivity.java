@@ -30,6 +30,7 @@ import com.dl.smartshouhi.fragment.FavoriteFragment;
 import com.dl.smartshouhi.fragment.HistoryFragment;
 import com.dl.smartshouhi.fragment.HomeFragment;
 import com.dl.smartshouhi.fragment.InvoiceInformationFragment;
+import com.dl.smartshouhi.fragment.InvoiceInformationFragment1;
 import com.dl.smartshouhi.fragment.MyProfileFragment;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
@@ -44,7 +45,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private TextView tvName, tvEmail;
     private NavigationView mNavigationView;
     final private MyProfileFragment myProfileFragment = new MyProfileFragment();
-    final private InvoiceInformationFragment invoiceInformationFragment = new InvoiceInformationFragment();
+    final private InvoiceInformationFragment1 invoiceInformationFragment = new InvoiceInformationFragment1();
 
     public static final int MY_REQUEST_CODE = 311;
     private static final int FRAGMENT_HOME = 0;
