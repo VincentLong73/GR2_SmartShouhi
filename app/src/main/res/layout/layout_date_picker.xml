@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:padding="8dp"
     android:layout_height="match_parent">
@@ -9,16 +9,28 @@
     <DatePicker
         android:id="@+id/date_picker"
         android:layout_width="match_parent"
+        android:layout_height="0dp"
         android:calendarViewShown="true"
         android:spinnersShown="false"
-        android:layout_weight="10"
-        android:layout_height="0dp" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <Button
         android:id="@+id/date_time_set"
-        android:layout_weight="1"
         android:layout_width="match_parent"
-        android:text="Set"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginStart="64dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="64dp"
+        android:background="@drawable/background_btn"
+        android:text="Setup"
+        android:textColor="#ffffff"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/date_picker" />
 
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

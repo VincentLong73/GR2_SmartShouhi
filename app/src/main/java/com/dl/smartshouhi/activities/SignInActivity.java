@@ -43,7 +43,7 @@ public class SignInActivity extends AppCompatActivity {
         layoutSignUp = findViewById(R.id.layout_sign_up);
         edtEmail = findViewById(R.id.edt_email);
         edtPassword = findViewById(R.id.edt_password);
-        btnSignIn = findViewById(R.id.btn_sign_in);
+        btnSignIn = findViewById(R.id.btn_sign_up);
         layoutForgotPassword = findViewById(R.id.layout_forgot_password);
     }
 

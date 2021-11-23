@@ -14,7 +14,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SmartShouhi">
         <activity android:name=".activities.MainActivity"/>
+        <activity android:name=".activities.HomeActivity"/>
+        <activity android:name=".activities.HomeActivity1"/>
         <activity android:name=".activities.InvoiceInformationActivity"/>
+        <activity android:name=".activities.ChartActivity"/>
         <activity android:name=".activities.SignInActivity"/>
         <activity android:name=".activities.SignUpActivity"/>
         <activity android:name=".activities.SplashActivity">

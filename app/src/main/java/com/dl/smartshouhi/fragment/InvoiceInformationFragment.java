@@ -12,21 +12,28 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.DatePicker;
+import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
 import com.dl.smartshouhi.R;
+import com.dl.smartshouhi.activities.HomeActivity1;
 import com.dl.smartshouhi.activities.MainActivity;
 import com.dl.smartshouhi.api.ApiService;
 import com.dl.smartshouhi.model.Invoice;
 import com.dl.smartshouhi.utils.RealPathUtil;
 
 import java.io.File;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -37,16 +44,20 @@ import retrofit2.Response;
 
 public class InvoiceInformationFragment extends Fragment {
 
-    private MainActivity mainActivity;
+//    private MainActivity mainActivity;
 
+    private HomeActivity1 homeActivity;
     private View mView;
 
     private static final int MY_REQUEST_CODE = 7;
 
-    private TextView tvSeller;
-    private TextView tvAddress;
-    private TextView tvTimestamp;
-    private TextView tvTotalCost;
+    private EditText edtSeller;
+    private EditText edtAddress;
+    private EditText edtTimestamp;
+    private EditText edtTotalCost;
+    private ImageButton imgButtonCalendar;
+
+
 
     private ImageView imgFromGallery;
 
@@ -62,42 +73,67 @@ public class InvoiceInformationFragment extends Fragment {
         mView = inflater.inflate(R.layout.fragment_invoice_information, container, false);
 
         initUI();
-        mainActivity = (MainActivity) getActivity();
+//        mainActivity = (MainActivity) getActivity();
+        homeActivity = (HomeActivity1) getActivity();
         mProressDialog = new ProgressDialog(getActivity());
         mProressDialog.setMessage("Please wait ...");
+
 
         btnSelectImage.setOnClickListener(v -> onClickRequestPermission());
 
         btnGetIn4.setOnClickListener(v -> CallApi());
+        imgButtonCalendar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                displayCalendar();
+            }
+        });
 
         return mView;
     }
 
+
+
     private void initUI() {
-        tvSeller = mView.findViewById(R.id.seller);
-        tvAddress = mView.findViewById(R.id.address);
-        tvTimestamp = mView.findViewById(R.id.timestamp);
-        tvTotalCost = mView.findViewById(R.id.total_cost);
+        edtSeller = mView.findViewById(R.id.edt_seller);
+        edtAddress = mView.findViewById(R.id.edt_address);
+        edtTimestamp = mView.findViewById(R.id.edt_timestamp);
+        edtTotalCost = mView.findViewById(R.id.edt_total_cost);
+
+
+        android.text.format.DateFormat dateFormat = new android.text.format.DateFormat();
+        String currentDate1 = dateFormat.format("dd/MM/yyyy", new Date()).toString();
+
+        edtTimestamp.setText(currentDate1);
 
         imgFromGallery = mView.findViewById(R.id.img_from_gallery);
 
         btnGetIn4 = mView.findViewById(R.id.btn_get_in4);
         btnSelectImage = mView.findViewById(R.id.btn_select_image);
+        imgButtonCalendar = mView.findViewById(R.id.btn_calendar);
+
+
     }
 
     private void onClickRequestPermission() {
 
-        if(mainActivity == null){
+//        if(mainActivity == null){
+//            return;
+//        }
+
+        if(homeActivity == null){
             return;
         }
 
         if(Build.VERSION.SDK_INT < Build.VERSION_CODES.M){
-            mainActivity.openGallery();
+//            mainActivity.openGallery();
+            homeActivity.openGallery();
             return;
         }
 
         if(getActivity().checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED){
-            mainActivity.openGallery();
+//            mainActivity.openGallery();
+            homeActivity.openGallery();
         }else{
             String [] permission = {Manifest.permission.READ_EXTERNAL_STORAGE};
             getActivity().requestPermissions(permission, MY_REQUEST_CODE);
@@ -123,10 +159,10 @@ public class InvoiceInformationFragment extends Fragment {
                 Invoice invoice = response.body();
                 if(invoice != null){
                     mProressDialog.dismiss();
-                    tvSeller.setText(invoice.getSeller());
-                    tvAddress.setText(invoice.getAddress());
-                    tvTimestamp.setText(invoice.getTimestamp());
-                    tvTotalCost.setText(invoice.getTotalCost());
+                    edtSeller.setText(invoice.getSeller());
+                    edtAddress.setText(invoice.getAddress());
+                    edtTimestamp.setText(invoice.getTimestamp());
+                    edtTotalCost.setText(invoice.getTotalCost());
                 }
             }
 
@@ -138,6 +174,31 @@ public class InvoiceInformationFragment extends Fragment {
             }
         });
     }
+
+    private void displayCalendar() {
+        final View dialogView = View.inflate(getActivity(), R.layout.layout_date_picker, null);
+        final AlertDialog alertDialog = new AlertDialog.Builder(getActivity()).create();
+
+        dialogView.findViewById(R.id.date_time_set).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                DatePicker datePicker = (DatePicker) dialogView.findViewById(R.id.date_picker);
+
+                Calendar calendar = new GregorianCalendar(datePicker.getYear(),
+                        datePicker.getMonth(),
+                        datePicker.getDayOfMonth());
+
+                android.text.format.DateFormat dateFormat = new android.text.format.DateFormat();
+                String currentDate = dateFormat.format("dd/MM/yyyy", calendar).toString();
+                edtTimestamp.setText(currentDate);
+
+                alertDialog.dismiss();
+            }});
+        alertDialog.setView(dialogView);
+        alertDialog.show();
+    }
+
 
     public void setBitmapImageView(Bitmap bitmapImageView){
         imgFromGallery.setImageBitmap(bitmapImageView);

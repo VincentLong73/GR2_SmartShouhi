@@ -17,7 +17,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
-            android:text="Select Image From Gallery"/>
+            android:background="@drawable/background_btn"
+            android:text="Select Image From Gallery" />
 
         <ImageView
             android:id="@+id/img_from_gallery"
@@ -31,94 +32,126 @@
             android:id="@+id/btn_get_in4"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Get information"
-            />
+            android:background="@drawable/background_btn"
+            android:text="Get information" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:paddingStart="10dp"
+            android:layout_margin="5dp"
+            android:background="@drawable/edittext_background"
             android:orientation="horizontal"
-            android:layout_margin="5sp"
             android:padding="2sp">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:text="Seller"
+                android:textColor="@color/purple_700"
                 android:textSize="16sp"
-                android:text="Seller"/>
-            <TextView
-                android:id="@+id/seller"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/edt_seller"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="5dp"
-                android:textSize="16sp"
-                android:textColor="@android:color/black"/>
+                android:hint="seller"
+                android:textColor="@android:color/black"
+                android:textSize="16sp" />
 
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:paddingStart="10dp"
+            android:layout_margin="5dp"
+            android:background="@drawable/edittext_background"
             android:orientation="horizontal"
-            android:layout_margin="5sp"
             android:padding="2sp">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:text="Address"
+                android:textColor="@color/purple_700"
                 android:textSize="16sp"
-                android:text="Address"/>
-            <TextView
-                android:id="@+id/address"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/edt_address"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="5dp"
-                android:textSize="16sp"
-                android:textColor="@android:color/black"/>
+                android:hint="address"
+                android:textColor="@android:color/black"
+                android:textSize="16sp" />
 
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:paddingStart="10dp"
+            android:layout_margin="5dp"
+            android:background="@drawable/edittext_background"
             android:orientation="horizontal"
-            android:layout_margin="5sp"
             android:padding="2sp">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:text="Timestmap"
+                android:textColor="@color/purple_700"
                 android:textSize="16sp"
-                android:text="Timestmap"/>
-            <TextView
-                android:id="@+id/timestamp"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/edt_timestamp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="5dp"
-                android:textSize="16sp"
-                android:textColor="@android:color/black"/>
+                android:hint="01/01/2022"
+                android:textColor="@android:color/black"
+                android:textSize="16sp" />
+
+            <ImageButton
+                android:id="@+id/btn_calendar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_gravity="center"
+                android:background="@drawable/ic_calendar" />
 
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:paddingStart="10dp"
+            android:layout_margin="5dp"
+            android:background="@drawable/edittext_background"
             android:orientation="horizontal"
-            android:layout_margin="5sp"
             android:padding="2sp">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:text="Total cost"
+                android:textColor="@color/purple_700"
                 android:textSize="16sp"
-                android:text="Total cost"/>
-            <TextView
-                android:id="@+id/total_cost"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/edt_total_cost"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="5dp"
-                android:textSize="16sp"
-                android:textColor="@android:color/black"/>
+                android:hint="0.00"
+                android:textColor="@android:color/black"
+                android:textSize="16sp" />
 
         </LinearLayout>
 

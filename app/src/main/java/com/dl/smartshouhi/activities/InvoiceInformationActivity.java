@@ -1,12 +1,5 @@
 package com.dl.smartshouhi.activities;
 
-import androidx.activity.result.ActivityResult;
-import androidx.activity.result.ActivityResultCallback;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.Manifest;
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -17,12 +10,22 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.DatePicker;
+import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.dl.smartshouhi.R;
 import com.dl.smartshouhi.api.ApiService;
@@ -31,6 +34,9 @@ import com.dl.smartshouhi.utils.RealPathUtil;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -43,12 +49,16 @@ public class InvoiceInformationActivity extends AppCompatActivity {
 
     public static final String TAG = InvoiceInformationActivity.class.getName();
 
+
     private static final int MY_REQUEST_CODE = 7;
 
-    private TextView tvSeller;
-    private TextView tvAddress;
-    private TextView tvTimestamp;
-    private TextView tvTotalCost;
+    private EditText edtSeller;
+    private EditText edtAddress;
+    private EditText edtTimestamp;
+    private EditText edtTotalCost;
+    private ImageButton imgButtonCalendar;
+
+
 
     private ImageView imgFromGallery;
 
@@ -57,7 +67,7 @@ public class InvoiceInformationActivity extends AppCompatActivity {
     private Uri mUri;
     private ProgressDialog mProressDialog;
 
-    private ActivityResultLauncher<Intent> mActivityResultLauncher = registerForActivityResult(
+    private final ActivityResultLauncher<Intent> mActivityResultLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             new ActivityResultCallback<ActivityResult>() {
                 @Override
@@ -85,41 +95,52 @@ public class InvoiceInformationActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_invoice_infor);
+        setContentView(R.layout.fragment_invoice_information);
+
 
         initUI();
         mProressDialog = new ProgressDialog(this);
         mProressDialog.setMessage("Please wait ...");
 
+
         btnSelectImage.setOnClickListener(v -> onClickRequestPermission());
 
-        btnGetIn4.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                CallApi();
-            }
-        });
+        btnGetIn4.setOnClickListener(v -> CallApi());
+        imgButtonCalendar.setOnClickListener(v -> displayCalendar());
+
     }
 
+
+
     private void initUI() {
-        tvSeller = findViewById(R.id.seller);
-        tvAddress = findViewById(R.id.address);
-        tvTimestamp = findViewById(R.id.timestamp);
-        tvTotalCost = findViewById(R.id.total_cost);
+        edtSeller = findViewById(R.id.edt_seller);
+        edtAddress = findViewById(R.id.edt_address);
+        edtTimestamp = findViewById(R.id.edt_timestamp);
+        edtTotalCost = findViewById(R.id.edt_total_cost);
+
+
+        String currentDate1 = DateFormat.format("dd/MM/yyyy", new Date()).toString();
+
+        edtTimestamp.setText(currentDate1);
 
         imgFromGallery = findViewById(R.id.img_from_gallery);
 
         btnGetIn4 = findViewById(R.id.btn_get_in4);
         btnSelectImage = findViewById(R.id.btn_select_image);
+        imgButtonCalendar = findViewById(R.id.btn_calendar);
+
+
     }
 
     private void onClickRequestPermission() {
+
+
         if(Build.VERSION.SDK_INT < Build.VERSION_CODES.M){
             openGallery();
             return;
         }
 
-        if(checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED){
+        if(this.checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED){
             openGallery();
         }else{
             String [] permission = {Manifest.permission.READ_EXTERNAL_STORAGE};
@@ -127,22 +148,6 @@ public class InvoiceInformationActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull  int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if(requestCode == MY_REQUEST_CODE){
-            if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
-                openGallery();
-            }
-        }
-    }
-
-    private void openGallery() {
-        Intent intent = new Intent();
-        intent.setType("image/*");
-        intent.setAction(Intent.ACTION_GET_CONTENT);
-        mActivityResultLauncher.launch(Intent.createChooser(intent, "Select Picture"));
-    }
 
     private void CallApi() {
 
@@ -162,10 +167,10 @@ public class InvoiceInformationActivity extends AppCompatActivity {
                 Invoice invoice = response.body();
                 if(invoice != null){
                     mProressDialog.dismiss();
-                    tvSeller.setText(invoice.getSeller());
-                    tvAddress.setText(invoice.getAddress());
-                    tvTimestamp.setText(invoice.getTimestamp());
-                    tvTotalCost.setText(invoice.getTotalCost());
+                    edtSeller.setText(invoice.getSeller());
+                    edtAddress.setText(invoice.getAddress());
+                    edtTimestamp.setText(invoice.getTimestamp());
+                    edtTotalCost.setText(invoice.getTotalCost());
                 }
             }
 
@@ -173,8 +178,36 @@ public class InvoiceInformationActivity extends AppCompatActivity {
             public void onFailure(Call<Invoice> call, Throwable t) {
                 mProressDialog.dismiss();
                 t.printStackTrace();
-                Toast.makeText(InvoiceInformationActivity.this, "Call Api False", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Call Api False", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private void displayCalendar() {
+        final View dialogView = View.inflate(this, R.layout.layout_date_picker, null);
+        final AlertDialog alertDialog = new AlertDialog.Builder(this).create();
+
+        dialogView.findViewById(R.id.date_time_set).setOnClickListener(view -> {
+
+            DatePicker datePicker = dialogView.findViewById(R.id.date_picker);
+
+            Calendar calendar = new GregorianCalendar(datePicker.getYear(),
+                    datePicker.getMonth(),
+                    datePicker.getDayOfMonth());
+
+            String currentDate = DateFormat.format("dd/MM/yyyy", calendar).toString();
+            edtTimestamp.setText(currentDate);
+
+            alertDialog.dismiss();
+        });
+        alertDialog.setView(dialogView);
+        alertDialog.show();
+    }
+
+    public void openGallery() {
+        Intent intent = new Intent();
+        intent.setType("image/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        mActivityResultLauncher.launch(Intent.createChooser(intent, "Select Picture"));
     }
 }

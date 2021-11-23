@@ -23,6 +23,7 @@ import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
 import com.dl.smartshouhi.R;
+import com.dl.smartshouhi.activities.HomeActivity1;
 import com.dl.smartshouhi.activities.MainActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -39,7 +40,8 @@ public class MyProfileFragment extends Fragment {
     private TextView tvEmail;
     private Button btnUpdateProfile;
     private Uri mUri;
-    private MainActivity mainActivity;
+//    private MainActivity mainActivity;
+    private HomeActivity1 homeActivity;
 
     private ProgressDialog progressDialog;
 
@@ -49,7 +51,8 @@ public class MyProfileFragment extends Fragment {
         mView = inflater.inflate(R.layout.fragment_profile, container, false);
 
         initUI();
-        mainActivity = (MainActivity) getActivity();
+//        mainActivity = (MainActivity) getActivity();
+        homeActivity = (HomeActivity1) getActivity();
         progressDialog = new ProgressDialog(getActivity());
         progressDialog.setMessage("Please Wait...");
 
@@ -88,16 +91,16 @@ public class MyProfileFragment extends Fragment {
 
     private void onClickRequestPermission() {
 
-        if(mainActivity == null){
+        if(homeActivity == null){
             return;
         }
         if(Build.VERSION.SDK_INT < Build.VERSION_CODES.M){
-            mainActivity.openGallery();
+            homeActivity.openGallery();
             return;
         }
 
         if(getActivity().checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED){
-            mainActivity.openGallery();
+            homeActivity.openGallery();
         }else{
             String[] permissions = {Manifest.permission.READ_EXTERNAL_STORAGE};
             getActivity().requestPermissions(permissions, MY_REQUEST_CODE);
@@ -130,7 +133,7 @@ public class MyProfileFragment extends Fragment {
                     progressDialog.dismiss();
                     if (task.isSuccessful()) {
                         Toast.makeText(getActivity(), "Update Profile Success", Toast.LENGTH_LONG).show();
-                        mainActivity.showUserInformation();
+//                        homeActivity.showUserInformation();
                     }
                 });
     }
