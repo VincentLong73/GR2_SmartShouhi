@@ -23,8 +23,7 @@ import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
 import com.dl.smartshouhi.R;
-import com.dl.smartshouhi.activities.HomeActivity1;
-import com.dl.smartshouhi.activities.MainActivity;
+import com.dl.smartshouhi.activities.HomeActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
@@ -41,7 +40,7 @@ public class MyProfileFragment extends Fragment {
     private Button btnUpdateProfile;
     private Uri mUri;
 //    private MainActivity mainActivity;
-    private HomeActivity1 homeActivity;
+    private HomeActivity homeActivity;
 
     private ProgressDialog progressDialog;
 
@@ -52,7 +51,7 @@ public class MyProfileFragment extends Fragment {
 
         initUI();
 //        mainActivity = (MainActivity) getActivity();
-        homeActivity = (HomeActivity1) getActivity();
+        homeActivity = (HomeActivity) getActivity();
         progressDialog = new ProgressDialog(getActivity());
         progressDialog.setMessage("Please Wait...");
 

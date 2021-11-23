@@ -51,7 +51,7 @@ public class SignUpActivity extends AppCompatActivity {
                 .addOnCompleteListener(this, task -> {
                     mProgressDialog.dismiss();
                     if (task.isSuccessful()) {
-                        Intent intent = new Intent(SignUpActivity.this, InvoiceInformationActivity.class);
+                        Intent intent = new Intent(SignUpActivity.this, HomeActivity.class);
                         startActivity(intent);
                         finishAffinity();// dong tat ca Activity sau thang MainActivity
                     } else {

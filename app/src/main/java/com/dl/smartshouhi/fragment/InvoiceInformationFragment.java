@@ -24,8 +24,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
 import com.dl.smartshouhi.R;
-import com.dl.smartshouhi.activities.HomeActivity1;
-import com.dl.smartshouhi.activities.MainActivity;
+import com.dl.smartshouhi.activities.HomeActivity;
 import com.dl.smartshouhi.api.ApiService;
 import com.dl.smartshouhi.model.Invoice;
 import com.dl.smartshouhi.utils.RealPathUtil;
@@ -46,7 +45,7 @@ public class InvoiceInformationFragment extends Fragment {
 
 //    private MainActivity mainActivity;
 
-    private HomeActivity1 homeActivity;
+    private HomeActivity homeActivity;
     private View mView;
 
     private static final int MY_REQUEST_CODE = 7;
@@ -74,7 +73,7 @@ public class InvoiceInformationFragment extends Fragment {
 
         initUI();
 //        mainActivity = (MainActivity) getActivity();
-        homeActivity = (HomeActivity1) getActivity();
+        homeActivity = (HomeActivity) getActivity();
         mProressDialog = new ProgressDialog(getActivity());
         mProressDialog.setMessage("Please wait ...");
 

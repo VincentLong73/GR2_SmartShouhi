@@ -86,7 +86,7 @@ public class SignInActivity extends AppCompatActivity {
                         mProgressDialog.dismiss();
 
                         if (task.isSuccessful()) {
-                            Intent intent = new Intent(SignInActivity.this, InvoiceInformationActivity.class);
+                            Intent intent = new Intent(SignInActivity.this, HomeActivity.class);
                             startActivity(intent);
                             finishAffinity();
                         } else {

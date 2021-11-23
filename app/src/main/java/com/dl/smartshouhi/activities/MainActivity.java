@@ -28,7 +28,7 @@ import com.dl.smartshouhi.R;
 import com.dl.smartshouhi.fragment.ChangePasswordFragment;
 import com.dl.smartshouhi.fragment.FavoriteFragment;
 import com.dl.smartshouhi.fragment.HistoryFragment;
-import com.dl.smartshouhi.fragment.HomeFragment1;
+import com.dl.smartshouhi.fragment.HomeFragment;
 import com.dl.smartshouhi.fragment.InvoiceInformationFragment;
 import com.dl.smartshouhi.fragment.MyProfileFragment;
 import com.google.android.material.navigation.NavigationView;
@@ -106,7 +106,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         mNavigationView.setNavigationItemSelectedListener(this);
 
-        replaceFragment(new HomeFragment1());
+        replaceFragment(new HomeFragment());
         mNavigationView.getMenu().findItem(R.id.nav_home).setChecked(true);
 
         showUserInformation();
@@ -156,7 +156,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         int id = item.getItemId();
         if(id == R.id.nav_home){
             if(currentFragment != FRAGMENT_HOME){
-                replaceFragment(new HomeFragment1());
+                replaceFragment(new HomeFragment());
                 currentFragment = FRAGMENT_HOME;
             }
         }else if(id == R.id.nav_history){
