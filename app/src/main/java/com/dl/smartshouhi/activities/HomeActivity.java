@@ -6,7 +6,6 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.view.MenuItem;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -23,15 +22,18 @@ import com.dl.smartshouhi.fragment.TestInfoFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.io.IOException;
+import java.util.Objects;
 
 public class HomeActivity extends AppCompatActivity {
+
 
     final private MyProfileFragment myProfileFragment = new MyProfileFragment();
     final private InvoiceInformationFragment invoiceInformationFragment = new InvoiceInformationFragment();
 
     public static final int MY_REQUEST_CODE = 311;
-    private static final String FRAGMENT_INVOICE_INFORMATION1 = "InvoiceInformationFragment";
+    private static final String FRAGMENT_INVOICE_INFORMATION = "InvoiceInformationFragment";
     private static final String FRAGMENT_PERSON = "PersonFragment";
+    private static final String FRAGMENT_HOME = "HomeFragment";
 
     private String currentFragment;
 
@@ -48,7 +50,7 @@ public class HomeActivity extends AppCompatActivity {
                     }
                     Uri uri = intent.getData();
 
-                    if(getCurrentFragment().equals(FRAGMENT_INVOICE_INFORMATION1) && checkVisibleFragment(FRAGMENT_INVOICE_INFORMATION1)){
+                    if(getCurrentFragment().equals(FRAGMENT_HOME) && checkVisibleFragment(FRAGMENT_INVOICE_INFORMATION)){
                         invoiceInformationFragment.setUri(uri);
                     }else if(getCurrentFragment().equals(FRAGMENT_PERSON) && checkVisibleFragment(FRAGMENT_PERSON) ){
                         myProfileFragment.setUri(uri);
@@ -57,7 +59,7 @@ public class HomeActivity extends AppCompatActivity {
                     try {
                         Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
 
-                        if(getCurrentFragment().equals(FRAGMENT_INVOICE_INFORMATION1) && checkVisibleFragment(FRAGMENT_INVOICE_INFORMATION1) ){
+                        if(getCurrentFragment().equals(FRAGMENT_HOME) && checkVisibleFragment(FRAGMENT_INVOICE_INFORMATION) ){
                             invoiceInformationFragment.setBitmapImageView(bitmap);
                         }else if(getCurrentFragment().equals(FRAGMENT_PERSON) && checkVisibleFragment(FRAGMENT_PERSON) ){
                             myProfileFragment.setBitmapImageView(bitmap);
@@ -84,26 +86,23 @@ public class HomeActivity extends AppCompatActivity {
     private void initUI() {
 
         bottomNavigationView = findViewById(R.id.bottom_nav);
-        replaceFragment(new HomeFragment() ,"HomeFragment");
+        replaceFragment(new HomeFragment(invoiceInformationFragment) ,"HomeFragment");
     }
 
     private void selectItemInBottomNavigation(){
-        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                switch (item.getItemId()){
-                    case R.id.action_home:
-                        replaceFragment(new HomeFragment(), "HomeFragment");
-                        break;
-                    case R.id.action_person:
-                        replaceFragment(myProfileFragment, "PersonFragment");
-                        break;
-                    case R.id.action_info:
-                        replaceFragment(new TestInfoFragment(), "InfoFragment");
-                        break;
-                }
-                return true;
+        bottomNavigationView.setOnNavigationItemSelectedListener(item -> {
+            switch (item.getItemId()){
+                case R.id.action_home:
+                    replaceFragment(new HomeFragment(invoiceInformationFragment), "HomeFragment");
+                    break;
+                case R.id.action_person:
+                    replaceFragment(myProfileFragment, "PersonFragment");
+                    break;
+                case R.id.action_info:
+                    replaceFragment(new TestInfoFragment(), "InfoFragment");
+                    break;
             }
+            return true;
         });
 
 //        bottomNavigationView.setOnItemReselectedListener(new NavigationBarView.OnItemReselectedListener() {
@@ -149,7 +148,7 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     public boolean checkVisibleFragment(String nameFragment){
-        return getSupportFragmentManager().findFragmentByTag(nameFragment).isVisible();
+        return Objects.requireNonNull(getSupportFragmentManager().findFragmentByTag(nameFragment)).isVisible();
     }
 
     public String getCurrentFragment() {

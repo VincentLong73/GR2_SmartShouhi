@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.dl.smartshouhi.R;
+import com.dl.smartshouhi.activities.HomeActivity;
 
 public class HomeFragment extends Fragment {
 
@@ -20,6 +21,12 @@ public class HomeFragment extends Fragment {
     private ImageView imgChart;
     private ImageView imgHistory;
     private ImageView imgFavorite;
+
+    private InvoiceInformationFragment invoiceInformationFragment;
+
+    public HomeFragment(InvoiceInformationFragment invoiceInformationFragment) {
+        this.invoiceInformationFragment = invoiceInformationFragment;
+    }
 
     @Nullable
     @Override
@@ -54,7 +61,7 @@ public class HomeFragment extends Fragment {
     private void onClickAddInvoice() {
 //        Intent intent = new Intent(getActivity(), InvoiceInformationActivity.class);
 //        startActivity(intent);
-        replaceFragment(new InvoiceInformationFragment(),"InvoiceInformationFragment");
+        replaceFragment(invoiceInformationFragment,"InvoiceInformationFragment");
     }
 
     private void onClickShowChart() {
@@ -68,6 +75,7 @@ public class HomeFragment extends Fragment {
     }
 
     private void replaceFragment(Fragment fragment, String nameFragment){
+
         FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
         transaction.replace(R.id.fragment_home, fragment, nameFragment);
         transaction.commit();

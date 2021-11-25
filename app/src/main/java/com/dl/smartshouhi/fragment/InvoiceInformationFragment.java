@@ -7,6 +7,7 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -43,8 +44,6 @@ import retrofit2.Response;
 
 public class InvoiceInformationFragment extends Fragment {
 
-//    private MainActivity mainActivity;
-
     private HomeActivity homeActivity;
     private View mView;
 
@@ -72,7 +71,6 @@ public class InvoiceInformationFragment extends Fragment {
         mView = inflater.inflate(R.layout.fragment_invoice_information, container, false);
 
         initUI();
-//        mainActivity = (MainActivity) getActivity();
         homeActivity = (HomeActivity) getActivity();
         mProressDialog = new ProgressDialog(getActivity());
         mProressDialog.setMessage("Please wait ...");
@@ -81,12 +79,7 @@ public class InvoiceInformationFragment extends Fragment {
         btnSelectImage.setOnClickListener(v -> onClickRequestPermission());
 
         btnGetIn4.setOnClickListener(v -> CallApi());
-        imgButtonCalendar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                displayCalendar();
-            }
-        });
+        imgButtonCalendar.setOnClickListener(v -> displayCalendar());
 
         return mView;
     }
@@ -100,8 +93,7 @@ public class InvoiceInformationFragment extends Fragment {
         edtTotalCost = mView.findViewById(R.id.edt_total_cost);
 
 
-        android.text.format.DateFormat dateFormat = new android.text.format.DateFormat();
-        String currentDate1 = dateFormat.format("dd/MM/yyyy", new Date()).toString();
+        String currentDate1 = DateFormat.format("dd/MM/yyyy", new Date()).toString();
 
         edtTimestamp.setText(currentDate1);
 
@@ -116,22 +108,16 @@ public class InvoiceInformationFragment extends Fragment {
 
     private void onClickRequestPermission() {
 
-//        if(mainActivity == null){
-//            return;
-//        }
-
         if(homeActivity == null){
             return;
         }
 
         if(Build.VERSION.SDK_INT < Build.VERSION_CODES.M){
-//            mainActivity.openGallery();
             homeActivity.openGallery();
             return;
         }
 
         if(getActivity().checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED){
-//            mainActivity.openGallery();
             homeActivity.openGallery();
         }else{
             String [] permission = {Manifest.permission.READ_EXTERNAL_STORAGE};
@@ -178,22 +164,19 @@ public class InvoiceInformationFragment extends Fragment {
         final View dialogView = View.inflate(getActivity(), R.layout.layout_date_picker, null);
         final AlertDialog alertDialog = new AlertDialog.Builder(getActivity()).create();
 
-        dialogView.findViewById(R.id.date_time_set).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        dialogView.findViewById(R.id.date_time_set).setOnClickListener(view -> {
 
-                DatePicker datePicker = (DatePicker) dialogView.findViewById(R.id.date_picker);
+            DatePicker datePicker = (DatePicker) dialogView.findViewById(R.id.date_picker);
 
-                Calendar calendar = new GregorianCalendar(datePicker.getYear(),
-                        datePicker.getMonth(),
-                        datePicker.getDayOfMonth());
+            Calendar calendar = new GregorianCalendar(datePicker.getYear(),
+                    datePicker.getMonth(),
+                    datePicker.getDayOfMonth());
 
-                android.text.format.DateFormat dateFormat = new android.text.format.DateFormat();
-                String currentDate = dateFormat.format("dd/MM/yyyy", calendar).toString();
-                edtTimestamp.setText(currentDate);
+            String currentDate = DateFormat.format("dd/MM/yyyy", calendar).toString();
+            edtTimestamp.setText(currentDate);
 
-                alertDialog.dismiss();
-            }});
+            alertDialog.dismiss();
+        });
         alertDialog.setView(dialogView);
         alertDialog.show();
     }
