@@ -6,11 +6,13 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.widget.TextView;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
@@ -34,11 +36,14 @@ public class HomeActivity extends AppCompatActivity {
     private static final String FRAGMENT_INVOICE_INFORMATION = "InvoiceInformationFragment";
     private static final String FRAGMENT_PERSON = "PersonFragment";
     private static final String FRAGMENT_HOME = "HomeFragment";
+    private static final String FRAGMENT_ABOUT_US = "AboutUsFragment";
 
     private String currentFragment;
 
 
     private BottomNavigationView bottomNavigationView;
+    private Toolbar toolbar;
+    private TextView tvTitleToolbar;
 
 
     private final ActivityResultLauncher<Intent> mActivityResultLauncher = registerForActivityResult(
@@ -78,28 +83,51 @@ public class HomeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_home);
 
         initUI();
+        toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        setTitleToolbar();
 
         selectItemInBottomNavigation();
     }
 
 
     private void initUI() {
-
+        tvTitleToolbar = findViewById(R.id.toolbar_title);
         bottomNavigationView = findViewById(R.id.bottom_nav);
-        replaceFragment(new HomeFragment(invoiceInformationFragment) ,"HomeFragment");
+        replaceFragment(new HomeFragment(invoiceInformationFragment) ,FRAGMENT_HOME);
+    }
+
+    private void setTitleToolbar(){
+        String title = "";
+        switch (currentFragment){
+            case FRAGMENT_HOME:
+                title = "Smart Shouhi";
+                break;
+            case FRAGMENT_PERSON:
+                title = "Thong tin ca nhan";
+                break;
+            case FRAGMENT_ABOUT_US:
+                title = "About us";
+                break;
+        }
+
+        if(getSupportActionBar() != null){
+//            getSupportActionBar().setTitle(title);
+            tvTitleToolbar.setText(title);
+        }
     }
 
     private void selectItemInBottomNavigation(){
         bottomNavigationView.setOnNavigationItemSelectedListener(item -> {
             switch (item.getItemId()){
                 case R.id.action_home:
-                    replaceFragment(new HomeFragment(invoiceInformationFragment), "HomeFragment");
+                    replaceFragment(new HomeFragment(invoiceInformationFragment), FRAGMENT_HOME);
                     break;
                 case R.id.action_person:
-                    replaceFragment(myProfileFragment, "PersonFragment");
+                    replaceFragment(myProfileFragment, FRAGMENT_PERSON);
                     break;
                 case R.id.action_info:
-                    replaceFragment(new TestInfoFragment(), "InfoFragment");
+                    replaceFragment(new TestInfoFragment(), FRAGMENT_ABOUT_US);
                     break;
             }
             return true;
@@ -127,6 +155,7 @@ public class HomeActivity extends AppCompatActivity {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.fragment_home, fragment, nameFragment);
         setCurrentFragment(nameFragment);
+        setTitleToolbar();
         transaction.commit();
     }
 
