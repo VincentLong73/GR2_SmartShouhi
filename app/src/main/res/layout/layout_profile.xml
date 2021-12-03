@@ -27,17 +27,17 @@
                 android:id="@+id/img_avatar_profile"
                 android:layout_width="160dp"
                 android:layout_height="160dp"
-                android:layout_marginTop="24dp"
+                android:layout_marginTop="20dp"
+                android:src="@drawable/ic_avatar_default"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                android:src="@drawable/ic_avatar_default"/>
+                app:layout_constraintTop_toTopOf="parent" />
 
-            <TextView
-                android:id="@+id/tv_username_profile"
+            <EditText
+                android:id="@+id/edt_username_profile"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="16dp"
                 android:text="Duyen Duyen"
                 android:textColor="#ffffff"
                 android:textSize="20dp"
@@ -50,13 +50,13 @@
                 android:id="@+id/tv_email_profile"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="8dp"
                 android:text="dlong@gmail.com"
                 android:textColor="#ffffff"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.498"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tv_username_profile" />
+                app:layout_constraintTop_toBottomOf="@+id/edt_username_profile" />
 
             <LinearLayout
                 android:id="@+id/linearLayout"

@@ -15,6 +15,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -43,7 +44,7 @@ public class PersonFragment extends Fragment implements NavigationView.OnNavigat
     private ProgressDialog progressDialog;
 
     private ImageView imgAvatar;
-    private TextView tvUsername;
+    private EditText edtUsername;
     private TextView tvEmail;
     private Button btnUpdateProfile;
 
@@ -100,7 +101,7 @@ public class PersonFragment extends Fragment implements NavigationView.OnNavigat
         NavigationView navigationView = view.findViewById(R.id.navigation_view);
 
         imgAvatar = view.findViewById(R.id.img_avatar_profile);
-        tvUsername = view.findViewById(R.id.tv_username_profile);
+        edtUsername = view.findViewById(R.id.edt_username_profile);
         tvEmail = view.findViewById(R.id.tv_email_profile);
         btnUpdateProfile = view.findViewById(R.id.btn_update_profile);
         
@@ -115,7 +116,7 @@ public class PersonFragment extends Fragment implements NavigationView.OnNavigat
         }
         Toast.makeText(getActivity(),"Hi "+user.getDisplayName(),Toast.LENGTH_LONG).show();
 
-        tvUsername.setText(user.getDisplayName());
+        edtUsername.setText(user.getDisplayName());
         tvEmail.setText(user.getEmail());
         Glide.with(getActivity()).load(user.getPhotoUrl()).error(R.drawable.ic_avatar_default).into(imgAvatar);
     }
@@ -153,7 +154,7 @@ public class PersonFragment extends Fragment implements NavigationView.OnNavigat
         }
 
         progressDialog.show();
-        String strUsername = tvUsername.getText().toString().trim();
+        String strUsername = edtUsername.getText().toString().trim();
         UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
                 .setDisplayName(strUsername)
                 .setPhotoUri(uri)

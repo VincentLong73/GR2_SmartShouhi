@@ -72,9 +72,6 @@ public class HomeFragment extends Fragment {
             return;
         }
 
-        Log.e("HOME", user.getPhotoUrl().toString());
-        Log.e("HOME", user.getDisplayName());
-
         tvUsername.setText(user.getDisplayName());
         Glide.with(homeActivity).load(user.getPhotoUrl()).error(R.drawable.ic_avatar_default).into(imgAvatar);
     }
