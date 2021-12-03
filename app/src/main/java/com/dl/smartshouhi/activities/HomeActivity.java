@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.view.Menu;
 import android.widget.TextView;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -20,6 +21,7 @@ import com.dl.smartshouhi.R;
 import com.dl.smartshouhi.fragment.HomeFragment;
 import com.dl.smartshouhi.fragment.InvoiceInformationFragment;
 import com.dl.smartshouhi.fragment.MyProfileFragment;
+import com.dl.smartshouhi.fragment.PersonFragment;
 import com.dl.smartshouhi.fragment.TestInfoFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -30,6 +32,7 @@ public class HomeActivity extends AppCompatActivity {
 
 
     final private MyProfileFragment myProfileFragment = new MyProfileFragment();
+    final private PersonFragment personFragment = new PersonFragment();
     final private InvoiceInformationFragment invoiceInformationFragment = new InvoiceInformationFragment();
 
     public static final int MY_REQUEST_CODE = 311;
@@ -42,8 +45,8 @@ public class HomeActivity extends AppCompatActivity {
 
 
     private BottomNavigationView bottomNavigationView;
-    private Toolbar toolbar;
     private TextView tvTitleToolbar;
+    private Menu mOptionsMenu;
 
 
     private final ActivityResultLauncher<Intent> mActivityResultLauncher = registerForActivityResult(
@@ -58,7 +61,8 @@ public class HomeActivity extends AppCompatActivity {
                     if(getCurrentFragment().equals(FRAGMENT_HOME) && checkVisibleFragment(FRAGMENT_INVOICE_INFORMATION)){
                         invoiceInformationFragment.setUri(uri);
                     }else if(getCurrentFragment().equals(FRAGMENT_PERSON) && checkVisibleFragment(FRAGMENT_PERSON) ){
-                        myProfileFragment.setUri(uri);
+//                        myProfileFragment.setUri(uri);
+                        personFragment.setUri(uri);
                     }
 
                     try {
@@ -67,7 +71,8 @@ public class HomeActivity extends AppCompatActivity {
                         if(getCurrentFragment().equals(FRAGMENT_HOME) && checkVisibleFragment(FRAGMENT_INVOICE_INFORMATION) ){
                             invoiceInformationFragment.setBitmapImageView(bitmap);
                         }else if(getCurrentFragment().equals(FRAGMENT_PERSON) && checkVisibleFragment(FRAGMENT_PERSON) ){
-                            myProfileFragment.setBitmapImageView(bitmap);
+//                            myProfileFragment.setBitmapImageView(bitmap);
+                            personFragment.setBitmapImageView(bitmap);
                         }
 
                     } catch (IOException e) {
@@ -83,10 +88,9 @@ public class HomeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_home);
 
         initUI();
-        toolbar = findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         setTitleToolbar();
-
         selectItemInBottomNavigation();
     }
 
@@ -112,7 +116,6 @@ public class HomeActivity extends AppCompatActivity {
         }
 
         if(getSupportActionBar() != null){
-//            getSupportActionBar().setTitle(title);
             tvTitleToolbar.setText(title);
         }
     }
@@ -124,7 +127,8 @@ public class HomeActivity extends AppCompatActivity {
                     replaceFragment(new HomeFragment(invoiceInformationFragment), FRAGMENT_HOME);
                     break;
                 case R.id.action_person:
-                    replaceFragment(myProfileFragment, FRAGMENT_PERSON);
+//                    replaceFragment(myProfileFragment, FRAGMENT_PERSON);
+                    replaceFragment(personFragment, FRAGMENT_PERSON);
                     break;
                 case R.id.action_info:
                     replaceFragment(new TestInfoFragment(), FRAGMENT_ABOUT_US);
@@ -156,6 +160,7 @@ public class HomeActivity extends AppCompatActivity {
         transaction.replace(R.id.fragment_home, fragment, nameFragment);
         setCurrentFragment(nameFragment);
         setTitleToolbar();
+//        setOptionMenuRight();
         transaction.commit();
     }
 
@@ -187,4 +192,26 @@ public class HomeActivity extends AppCompatActivity {
     public void setCurrentFragment(String currentFragment) {
         this.currentFragment = currentFragment;
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_notice, menu);
+        mOptionsMenu = menu;
+        return true;
+    }
+
+
+
+
+//    private void setOptionMenuRight(){
+//
+//        if(mOptionsMenu != null){
+//            mOptionsMenu.clear();
+//            if(currentFragment.equals(FRAGMENT_PERSON)){
+//                getMenuInflater().inflate(R.menu.menu_in_person, mOptionsMenu);
+//            }else{
+//                getMenuInflater().inflate(R.menu.menu_notice, mOptionsMenu);
+//            }
+//        }
+//    }
 }
