@@ -1,28 +1,41 @@
 package com.dl.smartshouhi.fragment;
 
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.bumptech.glide.Glide;
 import com.dl.smartshouhi.R;
 import com.dl.smartshouhi.activities.HomeActivity;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 public class HomeFragment extends Fragment {
 
     private View mView;
+    private ImageView imgAvatar;
+    private TextView tvUsername;
+
     private ImageView imgAddInvoice;
     private ImageView imgChart;
     private ImageView imgHistory;
     private ImageView imgFavorite;
 
     private InvoiceInformationFragment invoiceInformationFragment;
+    private HomeActivity homeActivity;
+
+    private Uri uri;
 
     public HomeFragment(InvoiceInformationFragment invoiceInformationFragment) {
         this.invoiceInformationFragment = invoiceInformationFragment;
@@ -35,16 +48,35 @@ public class HomeFragment extends Fragment {
         mView = inflater.inflate(R.layout.activity_dashboard, container, false);
 
         initUI();
+        setUserInformation();
         initListener();
 
         return mView;
     }
 
     private void initUI() {
+        homeActivity = (HomeActivity) getActivity();
+
+        imgAvatar = mView.findViewById(R.id.img_avatar_dashboard);
+        tvUsername = mView.findViewById(R.id.tv_username_dashboard);
+
         imgAddInvoice = mView.findViewById(R.id.img_add_an_invoice);
         imgChart = mView.findViewById(R.id.img_chart);
         imgHistory = mView.findViewById(R.id.img_history);
         imgFavorite = mView.findViewById(R.id.img_favorite);
+    }
+
+    private void setUserInformation(){
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if(user == null){
+            return;
+        }
+
+        Log.e("HOME", user.getPhotoUrl().toString());
+        Log.e("HOME", user.getDisplayName());
+
+        tvUsername.setText(user.getDisplayName());
+        Glide.with(homeActivity).load(user.getPhotoUrl()).error(R.drawable.ic_avatar_default).into(imgAvatar);
     }
 
     private void initListener() {
@@ -59,8 +91,7 @@ public class HomeFragment extends Fragment {
     }
 
     private void onClickAddInvoice() {
-//        Intent intent = new Intent(getActivity(), InvoiceInformationActivity.class);
-//        startActivity(intent);
+
         replaceFragment(invoiceInformationFragment,"InvoiceInformationFragment");
     }
 
@@ -79,11 +110,14 @@ public class HomeFragment extends Fragment {
         FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
         transaction.replace(R.id.fragment_home, fragment, nameFragment);
         transaction.commit();
-//        FragmentManager fragmentManager = getParentFragmentManager();
-//        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-//        fragmentTransaction.hide(HomeFragment1.this);
-//        fragmentTransaction.add(R.id.fragment_home, fragment);
-//        fragmentTransaction.commit();
+    }
+
+    public void setBitmapImageView(Bitmap bitmapImageView){
+        imgAvatar.setImageBitmap(bitmapImageView);
+    }
+
+    public void setUri(Uri mUri) {
+        this.uri = mUri;
     }
 
 }

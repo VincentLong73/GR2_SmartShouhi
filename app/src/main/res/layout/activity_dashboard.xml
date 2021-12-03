@@ -43,7 +43,7 @@
                 app:srcCompat="@drawable/circle1" />
 
             <de.hdodenhof.circleimageview.CircleImageView
-                android:id="@+id/imageView7"
+                android:id="@+id/img_avatar_dashboard"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
                 app:layout_constraintEnd_toEndOf="@+id/imageView6"
@@ -61,7 +61,7 @@
                 app:srcCompat="@drawable/profile" />
 -->
             <TextView
-                android:id="@+id/textView4"
+                android:id="@+id/tv_username_dashboard"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
@@ -77,11 +77,11 @@
                 android:id="@+id/imageView9"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:layout_constraintBottom_toBottomOf="@+id/textView4"
+                app:layout_constraintBottom_toBottomOf="@+id/tv_username_dashboard"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.804"
-                app:layout_constraintStart_toEndOf="@+id/textView4"
-                app:layout_constraintTop_toTopOf="@+id/textView4"
+                app:layout_constraintStart_toEndOf="@+id/tv_username_dashboard"
+                app:layout_constraintTop_toTopOf="@+id/tv_username_dashboard"
                 app:srcCompat="@drawable/ic_search"
                 tools:ignore="VectorDrawableCompat" />
 

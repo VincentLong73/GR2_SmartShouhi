@@ -34,6 +34,7 @@ public class HomeActivity extends AppCompatActivity {
     final private MyProfileFragment myProfileFragment = new MyProfileFragment();
     final private PersonFragment personFragment = new PersonFragment();
     final private InvoiceInformationFragment invoiceInformationFragment = new InvoiceInformationFragment();
+    final private HomeFragment homeFragment = new HomeFragment(invoiceInformationFragment);
 
     public static final int MY_REQUEST_CODE = 311;
     private static final String FRAGMENT_INVOICE_INFORMATION = "InvoiceInformationFragment";
@@ -60,6 +61,8 @@ public class HomeActivity extends AppCompatActivity {
 
                     if(getCurrentFragment().equals(FRAGMENT_HOME) && checkVisibleFragment(FRAGMENT_INVOICE_INFORMATION)){
                         invoiceInformationFragment.setUri(uri);
+                    }else if(getCurrentFragment().equals(FRAGMENT_HOME) && checkVisibleFragment(FRAGMENT_HOME) ){
+                        homeFragment.setUri(uri);
                     }else if(getCurrentFragment().equals(FRAGMENT_PERSON) && checkVisibleFragment(FRAGMENT_PERSON) ){
 //                        myProfileFragment.setUri(uri);
                         personFragment.setUri(uri);
@@ -70,6 +73,8 @@ public class HomeActivity extends AppCompatActivity {
 
                         if(getCurrentFragment().equals(FRAGMENT_HOME) && checkVisibleFragment(FRAGMENT_INVOICE_INFORMATION) ){
                             invoiceInformationFragment.setBitmapImageView(bitmap);
+                        }else if(getCurrentFragment().equals(FRAGMENT_HOME) && checkVisibleFragment(FRAGMENT_HOME) ){
+                            homeFragment.setBitmapImageView(bitmap);
                         }else if(getCurrentFragment().equals(FRAGMENT_PERSON) && checkVisibleFragment(FRAGMENT_PERSON) ){
 //                            myProfileFragment.setBitmapImageView(bitmap);
                             personFragment.setBitmapImageView(bitmap);
@@ -98,7 +103,7 @@ public class HomeActivity extends AppCompatActivity {
     private void initUI() {
         tvTitleToolbar = findViewById(R.id.toolbar_title);
         bottomNavigationView = findViewById(R.id.bottom_nav);
-        replaceFragment(new HomeFragment(invoiceInformationFragment) ,FRAGMENT_HOME);
+        replaceFragment(homeFragment ,FRAGMENT_HOME);
     }
 
     private void setTitleToolbar(){
@@ -124,7 +129,7 @@ public class HomeActivity extends AppCompatActivity {
         bottomNavigationView.setOnNavigationItemSelectedListener(item -> {
             switch (item.getItemId()){
                 case R.id.action_home:
-                    replaceFragment(new HomeFragment(invoiceInformationFragment), FRAGMENT_HOME);
+                    replaceFragment(homeFragment, FRAGMENT_HOME);
                     break;
                 case R.id.action_person:
 //                    replaceFragment(myProfileFragment, FRAGMENT_PERSON);
