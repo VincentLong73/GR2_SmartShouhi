@@ -45,7 +45,7 @@ public class InvoiceAdapter extends RecyclerView.Adapter<InvoiceAdapter.InvoiceV
         holder.tvSeller.setText(invoice.getSeller());
         holder.tvAddress.setText(invoice.getAddress());
         holder.tvTimestamp.setText(invoice.getTimestamp());
-        holder.tvTotalCost.setText(invoice.getTotalCost());
+        holder.tvTotalCost.setText(invoice.getTotalCost()+"");
 
         holder.btnUpdateItemInvoice.setOnClickListener(new View.OnClickListener() {
             @Override

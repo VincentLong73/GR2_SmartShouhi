@@ -9,19 +9,21 @@ public class Invoice {
     private String seller;
     private String address;
     private String timestamp;
-    private String totalCost;
+    private float totalCost;
+    private int dayOfWeek;
+    private int month;
 
     public Invoice() {
     }
 
-    public Invoice(String seller, String address, String timestamp, String totalCost) {
+    public Invoice(String seller, String address, String timestamp, float totalCost) {
         this.seller = seller;
         this.address = address;
         this.timestamp = timestamp;
         this.totalCost = totalCost;
     }
 
-    public Invoice(int id, String seller, String address, String timestamp, String totalCost) {
+    public Invoice(int id, String seller, String address, String timestamp, float totalCost) {
         this.id = id;
         this.seller = seller;
         this.address = address;
@@ -61,12 +63,28 @@ public class Invoice {
         this.timestamp = timestamp;
     }
 
-    public String getTotalCost() {
+    public float getTotalCost() {
         return totalCost;
     }
 
-    public void setTotalCost(String totalCost) {
+    public void setTotalCost(float totalCost) {
         this.totalCost = totalCost;
+    }
+
+    public int getDayOfWeek() {
+        return dayOfWeek;
+    }
+
+    public void setDayOfWeek(int dayOfWeek) {
+        this.dayOfWeek = dayOfWeek;
+    }
+
+    public int getMonth() {
+        return month;
+    }
+
+    public void setMonth(int month) {
+        this.month = month;
     }
 
     public Map<String, Object> toMap(){

@@ -19,13 +19,59 @@
             android:background="@drawable/background_btn"
             android:text="Select Image From Gallery" />
 
-        <ImageView
+<!--        <ImageView-->
+<!--            android:id="@+id/img_from_gallery"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_margin="10dp"-->
+<!--            android:src="@mipmap/ic_launcher"-->
+<!--            />-->
+
+        <com.github.chrisbanes.photoview.PhotoView
             android:id="@+id/img_from_gallery"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
+            android:layout_gravity="center"
             android:src="@mipmap/ic_launcher"
             />
+<!--        <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"-->
+<!--            android:id="@+id/container"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="500dp">-->
+
+<!--            <LinearLayout android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:orientation="vertical"-->
+<!--                android:padding="16dp">-->
+
+
+<!--                <ImageButton-->
+<!--                    android:id="@+id/img_button_zoom"-->
+<!--                    android:layout_width="30dp"-->
+<!--                    android:layout_height="30dp"-->
+<!--                    android:layout_gravity="center"-->
+<!--                    android:src="@drawable/ic_zoom_out"-->
+<!--                    android:scaleType="centerCrop"-->
+<!--                    />-->
+
+<!--            </LinearLayout>-->
+
+<!--            &lt;!&ndash; This initially-hidden ImageView will hold the expanded/zoomed version of-->
+<!--                 the images above. Without transformations applied, it takes up the entire-->
+<!--                 screen. To achieve the "zoom" animation, this view's bounds are animated-->
+<!--                 from the bounds of the thumbnail button above, to its final laid-out-->
+<!--                 bounds.-->
+<!--                 &ndash;&gt;-->
+
+<!--            <ImageView-->
+<!--                android:id="@+id/expanded_image"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="match_parent"-->
+<!--                android:visibility="invisible"-->
+<!--                />-->
+
+<!--        </FrameLayout>-->
 
         <Button
             android:id="@+id/btn_get_in4"

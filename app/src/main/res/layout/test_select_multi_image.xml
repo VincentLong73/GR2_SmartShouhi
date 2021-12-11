@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <Button
+            android:id="@+id/btn_select_image"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:background="@drawable/background_btn"
+            android:text="Select Image From Gallery" />
+
+        <androidx.viewpager2.widget.ViewPager2
+            android:id="@+id/view_pager"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:paddingStart="80dp"
+            android:paddingEnd="80dp"/>
+
+        <me.relex.circleindicator.CircleIndicator3
+            android:id="@+id/circle_indicator"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_marginTop="10dp"
+            android:gravity="center"
+            app:ci_drawable="@drawable/white_radius_circle_indicator"
+            app:ci_drawable_unselected="@drawable/black_radius_circle_indicator"
+            />
+<!--            app:ci_drawable="@drawable/background_indicator"/>-->
+
+<!--        <com.github.chrisbanes.photoview.PhotoView-->
+<!--            android:id="@+id/img_from_gallery"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_margin="10dp"-->
+<!--            android:layout_gravity="center"-->
+<!--            android:src="@mipmap/ic_launcher"-->
+<!--            />-->
+        <!--        <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"-->
+        <!--            android:id="@+id/container"-->
+        <!--            android:layout_width="match_parent"-->
+        <!--            android:layout_height="500dp">-->
+
+        <!--            <LinearLayout android:layout_width="match_parent"-->
+        <!--                android:layout_height="wrap_content"-->
+        <!--                android:orientation="vertical"-->
+        <!--                android:padding="16dp">-->
+
+
+        <!--                <ImageButton-->
+        <!--                    android:id="@+id/img_button_zoom"-->
+        <!--                    android:layout_width="30dp"-->
+        <!--                    android:layout_height="30dp"-->
+        <!--                    android:layout_gravity="center"-->
+        <!--                    android:src="@drawable/ic_zoom_out"-->
+        <!--                    android:scaleType="centerCrop"-->
+        <!--                    />-->
+
+        <!--            </LinearLayout>-->
+
+        <!--            &lt;!&ndash; This initially-hidden ImageView will hold the expanded/zoomed version of-->
+        <!--                 the images above. Without transformations applied, it takes up the entire-->
+        <!--                 screen. To achieve the "zoom" animation, this view's bounds are animated-->
+        <!--                 from the bounds of the thumbnail button above, to its final laid-out-->
+        <!--                 bounds.-->
+        <!--                 &ndash;&gt;-->
+
+        <!--            <ImageView-->
+        <!--                android:id="@+id/expanded_image"-->
+        <!--                android:layout_width="match_parent"-->
+        <!--                android:layout_height="match_parent"-->
+        <!--                android:visibility="invisible"-->
+        <!--                />-->
+
+        <!--        </FrameLayout>-->
+
+        <Button
+            android:id="@+id/btn_get_in4"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/background_btn"
+            android:text="Get information" />
+        <ImageView
+            android:id="@+id/img_merged"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="32dp"
+            android:layout_marginEnd="8dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:srcCompat="@tools:sample/avatars" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="10dp"
+            android:layout_margin="5dp"
+            android:background="@drawable/edittext_background"
+            android:orientation="horizontal"
+            android:padding="2sp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Seller"
+                android:textColor="@color/purple_700"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/edt_seller"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:hint="seller"
+                android:textColor="@android:color/black"
+                android:textSize="16sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="10dp"
+            android:layout_margin="5dp"
+            android:background="@drawable/edittext_background"
+            android:orientation="horizontal"
+            android:padding="2sp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Address"
+                android:textColor="@color/purple_700"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/edt_address"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:hint="address"
+                android:textColor="@android:color/black"
+                android:textSize="16sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="10dp"
+            android:layout_margin="5dp"
+            android:background="@drawable/edittext_background"
+            android:orientation="horizontal"
+            android:padding="2sp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Timestmap"
+                android:textColor="@color/purple_700"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/edt_timestamp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:hint="01/01/2022"
+                android:textColor="@android:color/black"
+                android:textSize="16sp" />
+
+            <ImageButton
+                android:id="@+id/btn_calendar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_gravity="center"
+                android:background="@drawable/ic_calendar" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="10dp"
+            android:layout_margin="5dp"
+            android:background="@drawable/edittext_background"
+            android:orientation="horizontal"
+            android:padding="2sp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Total cost"
+                android:textColor="@color/purple_700"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/edt_total_cost"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:hint="0.00"
+                android:textColor="@android:color/black"
+                android:textSize="16sp" />
+
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_margin="5dp"
+            android:orientation="horizontal"
+            android:padding="2sp">
+            <Button
+                android:id="@+id/btn_save_info"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/background_btn"
+                android:text="Save" />
+        </LinearLayout>
+
+    </LinearLayout>
+</ScrollView>

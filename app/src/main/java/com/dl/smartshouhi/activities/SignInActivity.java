@@ -76,6 +76,11 @@ public class SignInActivity extends AppCompatActivity {
 
         String email = edtEmail.getText().toString().trim();
         String password = edtPassword.getText().toString().trim();
+        if(email == null || password == null || email.length() == 0 || password.length() == 0){
+            Toast.makeText(SignInActivity.this, "Email and Password is not enterd",
+                    Toast.LENGTH_SHORT).show();
+            return;
+        }
 
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
         mAuth.signInWithEmailAndPassword(email, password)
@@ -101,7 +106,9 @@ public class SignInActivity extends AppCompatActivity {
     private void onClickForgotPassword() {
         mProgressDialog.show();
         FirebaseAuth auth = FirebaseAuth.getInstance();
-        String emailAddress = "longngodaugo1.1202@gmail.com";
+
+//        String emailAddress = "longngodaugo1.1202@gmail.com";
+        String emailAddress = auth.getCurrentUser().getEmail();
 
         auth.sendPasswordResetEmail(emailAddress)
                 .addOnCompleteListener(new OnCompleteListener<Void>() {

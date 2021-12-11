@@ -20,9 +20,9 @@ import androidx.fragment.app.FragmentTransaction;
 import com.dl.smartshouhi.R;
 import com.dl.smartshouhi.fragment.HomeFragment;
 import com.dl.smartshouhi.fragment.InvoiceInformationFragment;
+import com.dl.smartshouhi.fragment.InvoiceInformationFragment1;
 import com.dl.smartshouhi.fragment.MyProfileFragment;
 import com.dl.smartshouhi.fragment.PersonFragment;
-import com.dl.smartshouhi.fragment.TestInfoFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.io.IOException;
@@ -136,7 +136,7 @@ public class HomeActivity extends AppCompatActivity {
                     replaceFragment(personFragment, FRAGMENT_PERSON);
                     break;
                 case R.id.action_info:
-                    replaceFragment(new TestInfoFragment(), FRAGMENT_ABOUT_US);
+                    replaceFragment(new InvoiceInformationFragment1(), FRAGMENT_ABOUT_US);
                     break;
             }
             return true;

@@ -100,7 +100,7 @@ public class HistoryFragment extends Fragment {
             if(i >= totalInvoice1){
                 y = 0f;
             }else {
-                y = Float.parseFloat(invoices.get(i).getTotalCost().trim());
+                y = Float.parseFloat(invoices.get(i).getTotalCost()+"");
             }
             values.add(new BarEntry(x, y));
         }
