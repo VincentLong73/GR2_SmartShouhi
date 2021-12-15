@@ -41,7 +41,6 @@ public class BarChartFragment extends Fragment {
         this.invoiceList = invoiceList;
         this.maxXAxis = maxXAxis;
     }
-
     private View mView;
     private BarChart chart;
 
@@ -50,9 +49,7 @@ public class BarChartFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
         mView = inflater.inflate(R.layout.fragment_bar_chart_child, container, false);
-
         initUI();
-
         return mView;
     }
 

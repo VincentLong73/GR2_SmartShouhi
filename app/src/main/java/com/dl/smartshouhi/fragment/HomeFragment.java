@@ -3,7 +3,6 @@ package com.dl.smartshouhi.fragment;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,10 +31,9 @@ public class HomeFragment extends Fragment {
     private ImageView imgHistory;
     private ImageView imgFavorite;
 
-    private InvoiceInformationFragment invoiceInformationFragment;
+    private final InvoiceInformationFragment invoiceInformationFragment;
     private HomeActivity homeActivity;
 
-    private Uri uri;
 
     public HomeFragment(InvoiceInformationFragment invoiceInformationFragment) {
         this.invoiceInformationFragment = invoiceInformationFragment;
@@ -114,7 +112,6 @@ public class HomeFragment extends Fragment {
     }
 
     public void setUri(Uri mUri) {
-        this.uri = mUri;
     }
 
 }

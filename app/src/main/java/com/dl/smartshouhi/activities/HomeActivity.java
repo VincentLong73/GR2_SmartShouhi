@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.Menu;
 import android.widget.TextView;
 
@@ -23,7 +24,14 @@ import com.dl.smartshouhi.fragment.InvoiceInformationFragment;
 import com.dl.smartshouhi.fragment.InvoiceInformationFragment1;
 import com.dl.smartshouhi.fragment.MyProfileFragment;
 import com.dl.smartshouhi.fragment.PersonFragment;
+import com.dl.smartshouhi.model.User;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.io.IOException;
 import java.util.Objects;
@@ -48,6 +56,7 @@ public class HomeActivity extends AppCompatActivity {
     private BottomNavigationView bottomNavigationView;
     private TextView tvTitleToolbar;
     private Menu mOptionsMenu;
+
 
 
     private final ActivityResultLauncher<Intent> mActivityResultLauncher = registerForActivityResult(
@@ -101,8 +110,10 @@ public class HomeActivity extends AppCompatActivity {
 
 
     private void initUI() {
+
         tvTitleToolbar = findViewById(R.id.toolbar_title);
         bottomNavigationView = findViewById(R.id.bottom_nav);
+
         replaceFragment(homeFragment ,FRAGMENT_HOME);
     }
 
@@ -161,6 +172,7 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void replaceFragment(Fragment fragment, String nameFragment){
+
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.fragment_home, fragment, nameFragment);
         setCurrentFragment(nameFragment);
@@ -204,8 +216,6 @@ public class HomeActivity extends AppCompatActivity {
         mOptionsMenu = menu;
         return true;
     }
-
-
 
 
 //    private void setOptionMenuRight(){

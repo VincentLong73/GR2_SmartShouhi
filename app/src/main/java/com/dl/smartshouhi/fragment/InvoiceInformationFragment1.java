@@ -35,9 +35,14 @@ import com.dl.smartshouhi.activities.HomeActivity;
 import com.dl.smartshouhi.adapter.PhotoAdapter;
 import com.dl.smartshouhi.api.ApiService;
 import com.dl.smartshouhi.model.Invoice;
+import com.dl.smartshouhi.model.InvoiceModel;
+import com.dl.smartshouhi.model.User;
 import com.dl.smartshouhi.utils.RealPathUtil;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.gun0912.tedpermission.PermissionListener;
@@ -52,7 +57,6 @@ import java.util.GregorianCalendar;
 import java.util.List;
 
 import gun0912.tedbottompicker.TedBottomPicker;
-import gun0912.tedbottompicker.TedBottomSheetDialogFragment;
 import me.relex.circleindicator.CircleIndicator3;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -89,7 +93,10 @@ public class InvoiceInformationFragment1 extends Fragment {
     private Button btnGetIn4, btnSelectImage, btnSaveInfo;
 
     private Uri mUri;
-    private ProgressDialog mProressDialog;
+    private ProgressDialog mProgressDialog;
+
+    private long totalUser;
+    private int indexUserCurrent;
 
 
     @Nullable
@@ -107,8 +114,8 @@ public class InvoiceInformationFragment1 extends Fragment {
 
     private void initUI() {
         homeActivity = (HomeActivity) getActivity();
-        mProressDialog = new ProgressDialog(getActivity());
-        mProressDialog.setMessage("Please wait ...");
+        mProgressDialog = new ProgressDialog(getActivity());
+        mProgressDialog.setMessage("Please wait ...");
 
         edtSeller = mView.findViewById(R.id.edt_seller);
         edtAddress = mView.findViewById(R.id.edt_address);
@@ -138,12 +145,9 @@ public class InvoiceInformationFragment1 extends Fragment {
 
         CompositePageTransformer compositePageTransformer = new CompositePageTransformer();
         compositePageTransformer.addTransformer(new MarginPageTransformer(40));
-        compositePageTransformer.addTransformer(new ViewPager2.PageTransformer() {
-            @Override
-            public void transformPage(@NonNull View page, float position) {
-                float r = 1 - Math.abs(position);
-                page.setScaleY(0.85f + r * 0.15f);
-            }
+        compositePageTransformer.addTransformer((page, position) -> {
+            float r = 1 - Math.abs(position);
+            page.setScaleY(0.85f + r * 0.15f);
         });
         viewPager2.setPageTransformer(compositePageTransformer);
 
@@ -158,12 +162,9 @@ public class InvoiceInformationFragment1 extends Fragment {
         btnSelectImage.setOnClickListener(v -> onClickRequestPermission());
 
 //        btnGetIn4.setOnClickListener(v -> callApi());
-        btnGetIn4.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mergeListImages();
+        btnGetIn4.setOnClickListener(view -> {
+            mergeListImages();
 //                callApi();
-            }
         });
         btnSaveInfo.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -228,7 +229,7 @@ public class InvoiceInformationFragment1 extends Fragment {
         PermissionListener permissionListener = new PermissionListener() {
             @Override
             public void onPermissionGranted() {
-                selectImagesFromGalerry();
+                selectImagesFromGallery();
             }
 
             @Override
@@ -244,19 +245,16 @@ public class InvoiceInformationFragment1 extends Fragment {
 
     }
 
-    private void selectImagesFromGalerry() {
+    private void selectImagesFromGallery() {
 
         TedBottomPicker.with(homeActivity)
                 .setPeekHeight(1600)
                 .showTitle(false)
                 .setCompleteButtonText("Done")
                 .setEmptySelectionText("No Select")
-                .showMultiImage(new TedBottomSheetDialogFragment.OnMultiImageSelectedListener() {
-                    @Override
-                    public void onImagesSelected(List<Uri> uriList) {
-                        if(uriList != null && !uriList.isEmpty()){
-                            photoAdapter1.setData(uriList);
-                        }
+                .showMultiImage(uriList -> {
+                    if(uriList != null && !uriList.isEmpty()){
+                        photoAdapter1.setData(uriList);
                     }
                 });
 
@@ -271,13 +269,13 @@ public class InvoiceInformationFragment1 extends Fragment {
 
         if(Build.VERSION.SDK_INT < Build.VERSION_CODES.M){
 //            homeActivity.openGallery();
-            selectImagesFromGalerry();
+            selectImagesFromGallery();
             return;
         }
 
         if(getActivity().checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED){
 //            homeActivity.openGallery();
-            selectImagesFromGalerry();
+            selectImagesFromGallery();
         }else{
             String [] permission = {Manifest.permission.READ_EXTERNAL_STORAGE};
             getActivity().requestPermissions(permission, MY_REQUEST_CODE);
@@ -287,7 +285,7 @@ public class InvoiceInformationFragment1 extends Fragment {
 
     private void callApi() {
 
-        mProressDialog.show();
+        mProgressDialog.show();
 
         String strRealPath = RealPathUtil.getRealPath(getActivity(), mUri);
         Log.e("DuynDuyn", strRealPath);
@@ -300,10 +298,9 @@ public class InvoiceInformationFragment1 extends Fragment {
             @Override
             public void onResponse(Call<Invoice> call, Response<Invoice> response) {
 
-
                 Invoice invoice = response.body();
                 if(invoice != null){
-                    mProressDialog.dismiss();
+                    mProgressDialog.dismiss();
                     edtSeller.setText(invoice.getSeller());
                     edtAddress.setText(invoice.getAddress());
                     edtTimestamp.setText(invoice.getTimestamp());
@@ -313,7 +310,7 @@ public class InvoiceInformationFragment1 extends Fragment {
 
             @Override
             public void onFailure(Call<Invoice> call, Throwable t) {
-                mProressDialog.dismiss();
+                mProgressDialog.dismiss();
                 t.printStackTrace();
                 Toast.makeText(getActivity(), "Call Api False", Toast.LENGTH_SHORT).show();
             }
@@ -326,25 +323,18 @@ public class InvoiceInformationFragment1 extends Fragment {
             return;
         }
 
-        Invoice invoice = new Invoice();
+        InvoiceModel invoice = new InvoiceModel();
         invoice.setSeller(edtSeller.getText().toString());
         invoice.setAddress(edtAddress.getText().toString());
         invoice.setTimestamp(edtTimestamp.getText().toString());
         invoice.setTotalCost(Float.parseFloat(edtTotalCost.getText().toString()));
-
-        getUserByEmail();
+        saveInformationInvoiceOnFirebase(invoice);
 
         /* save into firebase
         https://console.firebase.google.com/u/6/project/smart-shouhi/database/smart-shouhi-default-rtdb/data
         https://firebase.google.com/docs/database/admin/save-data
         */
 
-    }
-
-    private void getUserByEmail() {
-
-        final FirebaseDatabase database = FirebaseDatabase.getInstance("https://smart-shouhi-default-rtdb.asia-southeast1.firebasedatabase.app/");
-        DatabaseReference ref = database.getReference("users");
     }
 
     private void displayCalendar() {
@@ -368,11 +358,86 @@ public class InvoiceInformationFragment1 extends Fragment {
         alertDialog.show();
     }
 
+    private void getTotalUserOnFb(InvoiceModel invoiceModel){
+        FirebaseDatabase database = FirebaseDatabase.getInstance("https://smart-shouhi-default-rtdb.asia-southeast1.firebasedatabase.app/");
+        DatabaseReference myRef = database.getReference();
+        myRef.child("totalUser").get().addOnCompleteListener(task -> {
+            if(task.isSuccessful()){
+                Log.e("Total User", String.valueOf(task.getResult().getValue()));
+                setTotalUser((Long) Long.parseLong(String.valueOf(task.getResult().getValue())));
+                getIdUserCurrent(invoiceModel);
+            }
+        });
+    }
+
+    private void getIdUserCurrent(InvoiceModel invoiceModel){
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        User user = new User(mAuth.getCurrentUser().getEmail());
+
+        FirebaseDatabase database = FirebaseDatabase.getInstance("https://smart-shouhi-default-rtdb.asia-southeast1.firebasedatabase.app/");
+        DatabaseReference myRef = database.getReference();
+
+        for(int i = 0 ; i<getTotalUser() ; i++){
+            int finalI = i;
+            myRef.child(i+"").child("email").get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<DataSnapshot> task) {
+
+                    if(task.isSuccessful()){
+                        String email = String.valueOf(task.getResult().getValue());
+                        if(email.equals(user.getEmail())){
+                            setIndexUserCurrent(finalI);
+                            getListInvoiceDatabase(invoiceModel);
+                        }
+
+                    }
+                }
+            });
+        }
+    }
+
+    private void getListInvoiceDatabase(InvoiceModel invoiceModel){
+
+        FirebaseDatabase database = FirebaseDatabase.getInstance("https://smart-shouhi-default-rtdb.asia-southeast1.firebasedatabase.app/");
+        DatabaseReference myRef = database.getReference(getIndexUserCurrent()+"/invoices");
+
+        myRef.child("totalInvoice").get().addOnCompleteListener(task -> {
+            if(task.isSuccessful()){
+                long totalInvoice = (Long) task.getResult().getValue();
+                invoiceModel.setId((int) totalInvoice);
+                myRef.child(totalInvoice+"").setValue(invoiceModel);
+                myRef.child("totalInvoice").setValue(totalInvoice+1);
+            }
+        });
+    }
+
+    private void saveInformationInvoiceOnFirebase(InvoiceModel invoiceResult){
+        getTotalUserOnFb(invoiceResult);
+    }
+
+
     public void setBitmapImageView(Bitmap bitmapImageView){
         imgFromGallery.setImageBitmap(bitmapImageView);
     }
 
     public void setUri(Uri mUri) {
         this.mUri = mUri;
+    }
+
+
+    public long getTotalUser() {
+        return totalUser;
+    }
+
+    public void setTotalUser(long totalUser) {
+        this.totalUser = totalUser;
+    }
+
+    public int getIndexUserCurrent() {
+        return indexUserCurrent;
+    }
+
+    public void setIndexUserCurrent(int indexUserCurrent) {
+        this.indexUserCurrent = indexUserCurrent;
     }
 }
