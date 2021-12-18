@@ -188,23 +188,30 @@ public class InvoiceInformationFragment1 extends Fragment {
                 e.printStackTrace();
             }
         }
-        Bitmap bmOverlay;
 
+        Bitmap bmOverlay;
 
         List<Integer> dimensionImage = getDimensionImage(listBimapImages);
         bmOverlay = Bitmap.createBitmap(dimensionImage.get(1), dimensionImage.get(0),
                 listBimapImages.get(0).getConfig());
 
-        imgMerged.setImageBitmap(bmOverlay);
+
+        Bitmap bitmap = merImageIntoCanvas(bmOverlay,listBimapImages);
+        imgMerged.setImageBitmap(bitmap);
     }
 
-    private void merImageIntoCanvas(Bitmap bmOverlay, List<Bitmap> bitmapList) {
+    private Bitmap merImageIntoCanvas(Bitmap bmOverlay,List<Bitmap> bitmapList) {
+
 
         Canvas canvas = new Canvas(bmOverlay);
         canvas.drawBitmap(bitmapList.get(0), new Matrix(), null);
+        float height = 0;
         for(int i = 1; i< bitmapList.size(); i++){
-            canvas.drawBitmap(bitmapList.get(i), 0, bitmapList.get(i-1).getHeight(), null);
+            height += bitmapList.get(i-1).getHeight();
+            canvas.drawBitmap(bitmapList.get(i), 0, height, null);
         }
+
+        return bmOverlay;
 
     }
 

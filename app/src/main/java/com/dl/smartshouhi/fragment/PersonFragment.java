@@ -88,10 +88,6 @@ public class PersonFragment extends Fragment implements NavigationView.OnNavigat
         setUserInformation();
         initListener();
 
-
-
-
-
         return view;
     }
 
@@ -277,7 +273,7 @@ public class PersonFragment extends Fragment implements NavigationView.OnNavigat
         this.uri = mUri;
     }
 
-    protected void showDialogUpdate(){
+    private void showDialogUpdate(){
 
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if(user == null){
@@ -316,11 +312,8 @@ public class PersonFragment extends Fragment implements NavigationView.OnNavigat
         if(user == null){
             return;
         }
-
         String strNewPassword = edtNewPassword.getText().toString().trim();
         String strConfirmPassword = edtConfirmPassword.getText().toString().trim();
-
-
 
         if(strNewPassword.equals(strConfirmPassword)){
             user.updatePassword(strNewPassword).addOnCompleteListener(new OnCompleteListener<Void>() {
