@@ -4,6 +4,7 @@
 
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
@@ -13,7 +14,6 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.SmartShouhi">
-        <activity android:name=".activities.MainActivity"/>
         <activity android:name=".activities.HomeActivity"/>
         <activity android:name=".activities.SignInActivity"/>
         <activity android:name=".activities.SignUpActivity"/>

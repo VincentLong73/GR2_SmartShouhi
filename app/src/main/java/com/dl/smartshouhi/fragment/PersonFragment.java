@@ -1,6 +1,7 @@
 package com.dl.smartshouhi.fragment;
 
 import android.Manifest;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -8,6 +9,8 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.Editable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -16,6 +19,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -30,6 +34,8 @@ import com.bumptech.glide.Glide;
 import com.dl.smartshouhi.R;
 import com.dl.smartshouhi.activities.HomeActivity;
 import com.dl.smartshouhi.activities.SignInActivity;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -41,12 +47,36 @@ public class PersonFragment extends Fragment implements NavigationView.OnNavigat
 
     private DrawerLayout drawerLayout;
     private View view;
+    private NavigationView mNavigationView;
+    private View viewDialogUpdate;
+    private View viewDialogChangePassword;
     private ProgressDialog progressDialog;
 
+    private Dialog dialogUpdate;
+    private Dialog dialogChangePassword;
+
+
     private ImageView imgAvatar;
-    private EditText edtUsername;
+    private TextView tvFullName;
     private TextView tvEmail;
+    private ImageView imgAvatarHeader;
+    private TextView tvEmailHeader;
+    private TextView tvUsernameHeader;
     private Button btnUpdateProfile;
+    private Button btnChangePassword;
+
+
+    private ImageView imgAvatarUpdate;
+    private ImageButton btnSelectImageUpdate;
+    private EditText edtPhoneUpdate;
+    private EditText edtFullNameUpdate;
+    private Button btnCancelUpdate;
+    private Button btnYesUpdate;
+
+    private EditText edtNewPassword;
+    private EditText edtConfirmPassword;
+    private Button btnCancelChange;
+    private Button btnYesChange;
 
     private Uri uri;
     private HomeActivity homeActivity;
@@ -57,6 +87,10 @@ public class PersonFragment extends Fragment implements NavigationView.OnNavigat
         initUI();
         setUserInformation();
         initListener();
+
+
+
+
 
         return view;
     }
@@ -97,16 +131,62 @@ public class PersonFragment extends Fragment implements NavigationView.OnNavigat
         progressDialog = new ProgressDialog(getActivity());
         progressDialog.setMessage("Please Wait...");
 
-        drawerLayout = view.findViewById(R.id.drawer_layout);
-        NavigationView navigationView = view.findViewById(R.id.navigation_view);
-
+        /*S- Bat dau khoi tao UI trong Profile */
         imgAvatar = view.findViewById(R.id.img_avatar_profile);
-        edtUsername = view.findViewById(R.id.edt_username_profile);
+        tvFullName = view.findViewById(R.id.tv_fullName_profile);
         tvEmail = view.findViewById(R.id.tv_email_profile);
+
         btnUpdateProfile = view.findViewById(R.id.btn_update_profile);
-        
-        navigationView.setNavigationItemSelectedListener(this);
+        btnChangePassword = view.findViewById(R.id.btn_change_password);
+
+        /*S- Bat dau khoi tao UI trong Dialog Change Password */
+
+        dialogChangePassword = new Dialog(getActivity());
+        dialogChangePassword.setCancelable(true);
+        viewDialogChangePassword  = getActivity().getLayoutInflater().inflate(R.layout.layout_dialog_change_password, null);
+        dialogChangePassword.setContentView(viewDialogChangePassword);
+
+        edtNewPassword = viewDialogChangePassword.findViewById(R.id.edt_new_password);
+        edtConfirmPassword = viewDialogChangePassword.findViewById(R.id.edt_confirm_password);
+
+        btnCancelChange = viewDialogChangePassword.findViewById(R.id.btn_cancel_change_password);
+        btnYesChange = viewDialogChangePassword.findViewById(R.id.btn_yes_change_password);
+
+        /*E- Ket thuc khoi tao UI trong Dialog Change Password */
+
+
+        /*E- Ket thuc khoi tao UI trong Profile */
+
+        /*S- Bat dau khoi tao UI trong Dialog Update */
+        dialogUpdate = new Dialog(getActivity());
+        dialogUpdate.setCancelable(true);
+
+        viewDialogUpdate  = homeActivity.getLayoutInflater().inflate(R.layout.layout_dialog_edit_profile, null);
+        dialogUpdate.setContentView(viewDialogUpdate);
+
+        imgAvatarUpdate = viewDialogUpdate.findViewById(R.id.img_avatar_profile_update);
+        btnSelectImageUpdate = viewDialogUpdate.findViewById(R.id.btn_image_update);
+        edtFullNameUpdate = viewDialogUpdate.findViewById(R.id.edt_fullName_update);
+        edtPhoneUpdate = viewDialogUpdate.findViewById(R.id.edt_phone_update);
+
+        btnCancelUpdate = viewDialogUpdate.findViewById(R.id.btn_cancel_update);
+        btnYesUpdate = viewDialogUpdate.findViewById(R.id.btn_yes_update);
+
+        /*E- Ket thuc khoi tao UI trong Dialog Update */
+
+
+
+        /*S- Bat dau khoi tao UI trong nav drawable */
+        drawerLayout = view.findViewById(R.id.drawer_layout);
+        mNavigationView = view.findViewById(R.id.navigation_view);
+
+        tvEmailHeader = mNavigationView.getHeaderView(0).findViewById(R.id.tv_email_nav_person);
+        tvUsernameHeader = mNavigationView.getHeaderView(0).findViewById(R.id.tv_name_nav_person);
+        imgAvatarHeader = mNavigationView.getHeaderView(0).findViewById(R.id.img_avatar_nav_person);
+
+        mNavigationView.setNavigationItemSelectedListener(this);
         setHasOptionsMenu(true);
+        /*E- Ket thuc khoi tao UI trong nav drawable */
     }
 
     private void setUserInformation(){
@@ -116,16 +196,27 @@ public class PersonFragment extends Fragment implements NavigationView.OnNavigat
         }
         Toast.makeText(getActivity(),"Hi "+user.getDisplayName(),Toast.LENGTH_LONG).show();
 
-        edtUsername.setText(user.getDisplayName());
+        tvFullName.setText(user.getDisplayName());
         tvEmail.setText(user.getEmail());
+        tvEmailHeader.setText(user.getEmail());
+        tvUsernameHeader.setText(user.getDisplayName());
+
+        uri = user.getPhotoUrl();
+
         Glide.with(getActivity()).load(user.getPhotoUrl()).error(R.drawable.ic_avatar_default).into(imgAvatar);
+        Glide.with(getActivity()).load(user.getPhotoUrl()).error(R.drawable.ic_avatar_default).into(imgAvatarHeader);
     }
 
     private void initListener() {
 
-        imgAvatar.setOnClickListener(v -> onClickRequestPermission());
+        btnUpdateProfile.setOnClickListener(v -> {
+//            onClickUpdateProfile();
+            showDialogUpdate();
+        });
 
-        btnUpdateProfile.setOnClickListener(v -> onClickUpdateProfile());
+        btnChangePassword.setOnClickListener(v -> {
+            showDialogChangePassword();
+        });
     }
 
     private void onClickRequestPermission() {
@@ -154,9 +245,13 @@ public class PersonFragment extends Fragment implements NavigationView.OnNavigat
         }
 
         progressDialog.show();
-        String strUsername = edtUsername.getText().toString().trim();
+        String strFullName = edtFullNameUpdate.getText().toString().trim();
+        String strPhone = edtPhoneUpdate.getText().toString().trim();
+
+
+
         UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
-                .setDisplayName(strUsername)
+                .setDisplayName(strFullName)
                 .setPhotoUri(uri)
                 .build();
 
@@ -166,16 +261,98 @@ public class PersonFragment extends Fragment implements NavigationView.OnNavigat
                     if (task.isSuccessful()) {
                         Toast.makeText(getActivity(), "Update Profile Success", Toast.LENGTH_LONG).show();
 //                        homeActivity.showUserInformation();
+                        setUserInformation();
+
+                        dialogUpdate.dismiss();
                     }
                 });
     }
 
+
     public void setBitmapImageView(Bitmap bitmapImageView){
-        imgAvatar.setImageBitmap(bitmapImageView);
+        imgAvatarUpdate.setImageBitmap(bitmapImageView);
     }
 
     public void setUri(Uri mUri) {
         this.uri = mUri;
     }
+
+    protected void showDialogUpdate(){
+
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if(user == null){
+            return;
+        }
+        if(user.getPhoneNumber() == null){
+            edtPhoneUpdate.setText("");
+        }else {
+            edtPhoneUpdate.setText(user.getPhoneNumber());
+        }
+        if(user.getDisplayName() == null){
+            edtFullNameUpdate.setText("");
+        }else {
+            edtFullNameUpdate.setText(user.getDisplayName());
+        }
+
+        Glide.with(getActivity()).load(user.getPhotoUrl()).error(R.drawable.ic_avatar_default).into(imgAvatarUpdate);
+
+        initListenerDialogUpdate();
+
+        dialogUpdate.show();
+    }
+
+
+    private void initListenerDialogUpdate(){
+        btnSelectImageUpdate.setOnClickListener(v -> onClickRequestPermission());
+
+        btnCancelUpdate.setOnClickListener(view -> dialogUpdate.dismiss());
+
+        btnYesUpdate.setOnClickListener(view -> onClickUpdateProfile());
+    }
+
+    private void onClickChangePassword() {
+
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if(user == null){
+            return;
+        }
+
+        String strNewPassword = edtNewPassword.getText().toString().trim();
+        String strConfirmPassword = edtConfirmPassword.getText().toString().trim();
+
+
+
+        if(strNewPassword.equals(strConfirmPassword)){
+            user.updatePassword(strNewPassword).addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    if(task.isSuccessful()){
+                        Toast.makeText(getActivity(), "Change Password Success", Toast.LENGTH_LONG).show();
+                    }else{
+                        Toast.makeText(getActivity(), "Change Password Failed", Toast.LENGTH_LONG).show();
+                    }
+                }
+            });
+            dialogChangePassword.dismiss();
+        }else {
+            Toast.makeText(getActivity(), "Confirm Password miss matching", Toast.LENGTH_LONG).show();
+        }
+
+    }
+
+    private void showDialogChangePassword(){
+
+        initListenerDialogChangePassword();
+        dialogChangePassword.show();
+    }
+
+
+    private void initListenerDialogChangePassword(){
+
+        btnCancelChange.setOnClickListener(view -> dialogChangePassword.dismiss());
+
+        btnYesChange.setOnClickListener(view -> onClickChangePassword());
+    }
+
 
 }

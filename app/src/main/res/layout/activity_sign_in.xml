@@ -76,14 +76,14 @@
 
     <Button
         android:id="@+id/btn_sign_up"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="64dp"
+        android:layout_marginStart="100dp"
         android:layout_marginTop="8dp"
-        android:layout_marginEnd="64dp"
+        android:layout_marginEnd="100dp"
         android:background="@drawable/background_btn"
         android:text="Login"
-        android:textColor="#ffffff"
+        android:textColor="#5B36F3"
         android:textSize="18sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"

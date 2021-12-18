@@ -8,12 +8,12 @@
     android:gravity="bottom">
 
     <de.hdodenhof.circleimageview.CircleImageView
-        android:id="@+id/img_avatar"
+        android:id="@+id/img_avatar_nav_person"
         android:layout_width="80dp"
         android:layout_height="80dp"
         android:src="@drawable/ic_avatar_default"/>
     <TextView
-        android:id="@+id/tv_name"
+        android:id="@+id/tv_name_nav_person"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Vincent Long"
@@ -23,7 +23,7 @@
         android:layout_marginTop="8dp"/>
 
     <TextView
-        android:id="@+id/tv_email"
+        android:id="@+id/tv_email_nav_person"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="dlong@gmail.com"
