@@ -4,11 +4,11 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.github.mikephil.charting.charts.BarChart
-        android:id="@+id/fragment_chart"
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/view_pager_show_bar_chart_in_fragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_margin="10dp"
-        android:padding="10dp" />
+        />
 
 </LinearLayout>

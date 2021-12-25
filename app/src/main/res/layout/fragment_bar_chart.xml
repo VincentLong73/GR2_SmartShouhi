@@ -5,6 +5,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:layout_margin="10dp"
+
     >
         <com.google.android.material.switchmaterial.SwitchMaterial
             android:id="@+id/btn_switch"
@@ -14,12 +15,14 @@
             android:textOff="Date"
             android:textOn="Month" />
 
+
         <FrameLayout
             android:id="@+id/fragment_show_chart"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_above="@+id/bottom_nav"
             android:layout_below="@+id/toolbar"
+            android:layout_marginTop="10dp"
             />
 
 </LinearLayout>

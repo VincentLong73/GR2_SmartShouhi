@@ -5,8 +5,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CompoundButton;
-import android.widget.Switch;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -16,8 +14,6 @@ import androidx.fragment.app.FragmentTransaction;
 import com.dl.smartshouhi.R;
 import com.dl.smartshouhi.model.Invoice;
 import com.dl.smartshouhi.model.User;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -27,10 +23,12 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
 import java.util.List;
-
-import okhttp3.internal.cache.DiskLruCache;
 
 public class ChartFragment extends Fragment {
     private static final int MAX_X_VALUE = 7;
@@ -40,22 +38,20 @@ public class ChartFragment extends Fragment {
     private static final int MAX_X_VALUE_MONTH = 12;
 
 
-    private int totalInvoice;
     private List<Invoice> invoiceList;
+    private Float[][] totalCostOfListInvoiceWeek;
+    private Float[][] totalCostOfListInvoiceYear;
 
     private View mView;
     private SwitchMaterial btnSwitch;
 
     private long totalUser;
     private int indexUserCurrent;
+    private int totalInvoice;
 
-    private User userCurrent;
+
 
     public ChartFragment() {
-    }
-
-    public ChartFragment(User userCurrent) {
-        this.userCurrent = userCurrent;
     }
 
     @Nullable
@@ -66,26 +62,38 @@ public class ChartFragment extends Fragment {
 
         initUI();
 
+        getTotalUserOnFb();
 
-
-        btnSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                if(btnSwitch.isChecked()){
-                    replaceFragmentChart(MONTHS,MAX_X_VALUE_MONTH);
-                }else{
-                    replaceFragmentChart(DAYS,MAX_X_VALUE);
-                }
+        btnSwitch.setOnCheckedChangeListener((compoundButton, b) -> {
+            if(btnSwitch.isChecked()){
+                replaceFragmentChart(totalCostOfListInvoiceYear,MONTHS,MAX_X_VALUE_MONTH);
+            }else{
+                replaceFragmentChart(totalCostOfListInvoiceWeek,DAYS,MAX_X_VALUE);
             }
         });
 
-        getTotalUserOnFb();
+
+
 
         return mView;
     }
     private void initUI() {
 
         invoiceList = new ArrayList<>();
+        totalCostOfListInvoiceWeek = new Float[52][7];
+        for(int i = 0;i<52 ; i ++){
+            Arrays.fill(totalCostOfListInvoiceWeek[i], 0f);
+        }
+        int year = Calendar.getInstance().get(Calendar.YEAR);
+        int numberYear = year - 2020 + 1;
+
+        Log.e("Check Year",year+"-"+numberYear);
+
+        totalCostOfListInvoiceYear = new Float[numberYear][12];
+        for(int i = 0;i<numberYear ; i ++){
+            Arrays.fill(totalCostOfListInvoiceYear[i], 0f);
+        }
+
         btnSwitch = mView.findViewById(R.id.btn_switch);
 
 
@@ -94,20 +102,15 @@ public class ChartFragment extends Fragment {
     private void getTotalUserOnFb(){
         FirebaseDatabase database = FirebaseDatabase.getInstance("https://smart-shouhi-default-rtdb.asia-southeast1.firebasedatabase.app/");
         DatabaseReference myRef = database.getReference();
-        myRef.child("totalUser").get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DataSnapshot> task) {
-                if(task.isSuccessful()){
-                    Log.e("Total User", String.valueOf(task.getResult().getValue()));
-                    setTotalUser((Long) Long.parseLong(String.valueOf(task.getResult().getValue())));
-                    getIdUserCurrent();
-                }
+        myRef.child("totalUser").get().addOnCompleteListener(task -> {
+            if(task.isSuccessful()){
+                setTotalUser((Long) Long.parseLong(String.valueOf(task.getResult().getValue())));
+                getIdUserCurrent();
             }
         });
     }
 
     private void getIdUserCurrent(){
-        Log.e("Total User 2 ", getTotalUser()+"");
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
         User user = new User(mAuth.getCurrentUser().getEmail());
 
@@ -116,19 +119,15 @@ public class ChartFragment extends Fragment {
 
         for(int i = 0 ; i<getTotalUser() ; i++){
             int finalI = i;
-            myRef.child(i+"").child("email").get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
-                @Override
-                public void onComplete(@NonNull Task<DataSnapshot> task) {
+            myRef.child(i+"").child("email").get().addOnCompleteListener(task -> {
 
-                    if(task.isSuccessful()){
-                        String email = String.valueOf(task.getResult().getValue());
-                        if(email.equals(user.getEmail())){
-                            Log.e("Id", finalI +"");
-                            setIndexUserCurrent(finalI);
-                            getListInvoiceDatabase();
-                        }
-
+                if(task.isSuccessful()){
+                    String email = String.valueOf(task.getResult().getValue());
+                    if(email.equals(user.getEmail())){
+                        setIndexUserCurrent(finalI);
+                        getListInvoiceDatabase();
                     }
+
                 }
             });
         }
@@ -156,7 +155,10 @@ public class ChartFragment extends Fragment {
                         }
                     }
                 }
-                replaceFragmentChart(DAYS,MAX_X_VALUE);
+
+                processingDataWeek();
+                processingDataYear();
+                replaceFragmentChart(totalCostOfListInvoiceWeek,DAYS,MAX_X_VALUE);
             }
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
@@ -164,10 +166,44 @@ public class ChartFragment extends Fragment {
         });
     }
 
-    private void replaceFragmentChart(String[] xLabels,  int maxXAxis){
+    private void processingDataWeek() {
+        for(Invoice invoice : invoiceList){
+
+            Calendar calendar = Calendar.getInstance();
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+            try {
+                calendar.setTime(dateFormat.parse(invoice.getTimestamp()));
+                int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
+                int weekOfYear = calendar.get(Calendar.WEEK_OF_YEAR);
+                totalCostOfListInvoiceWeek[weekOfYear-1][dayOfWeek-1] += invoice.getTotalCost();
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }
+
+    }
+    private void processingDataYear() {
+        for(Invoice invoice : invoiceList){
+
+            Calendar calendar = Calendar.getInstance();
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+            try {
+                calendar.setTime(dateFormat.parse(invoice.getTimestamp()));
+                int month = calendar.get(Calendar.MONTH);
+                int year = calendar.get(Calendar.YEAR);
+                totalCostOfListInvoiceYear[year - 2020][month] += invoice.getTotalCost();
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void replaceFragmentChart(Float[][] totalCostOfListInVoice,String[] xLabels,  int maxXAxis){
+
+
         FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
         transaction.replace(R.id.fragment_show_chart,
-                new BarChartFragment(xLabels,totalInvoice, invoiceList, maxXAxis),
+                new BarChartFragment(xLabels,totalCostOfListInVoice,maxXAxis),
                 "Bar Chart Fragment");
         transaction.commit();
     }
