@@ -19,12 +19,12 @@
                     android:layout_height="wrap_content"
                         />
 
-                <com.google.android.material.switchmaterial.SwitchMaterial
+                <Switch
                     android:id="@+id/btn_switch"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:splitTrack="true"
-                    android:textOff="Date"
+                    android:textOff="Day"
                     android:textOn="Month" />
         </LinearLayout>
 

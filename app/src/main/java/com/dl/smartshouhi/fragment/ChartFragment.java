@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -50,7 +51,8 @@ public class ChartFragment extends Fragment {
     private ArrayAdapter<String> spinnerAdapter;
 
     private View mView;
-    private SwitchMaterial btnSwitch;
+//    private SwitchMaterial btnSwitch;
+    private Switch btnSwitch;
     private Spinner spinnerYear;
 
     private long totalUser;

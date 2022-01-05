@@ -21,7 +21,7 @@ public class InvoiceAdapter extends RecyclerView.Adapter<InvoiceAdapter.InvoiceV
     private IClickListener iClickListener;
 
     public interface IClickListener{
-        void onClickUpdateItem(Invoice invoice);
+        void onClickUpdateItem(Invoice invoice, int position);
     }
 
     public InvoiceAdapter(List<Invoice> invoiceList, IClickListener iClickListener) {
@@ -50,7 +50,7 @@ public class InvoiceAdapter extends RecyclerView.Adapter<InvoiceAdapter.InvoiceV
         holder.btnUpdateItemInvoice.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                iClickListener.onClickUpdateItem(invoice);
+                iClickListener.onClickUpdateItem(invoice, position);
             }
         });
     }

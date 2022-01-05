@@ -87,7 +87,8 @@ public class HomeFragment extends Fragment {
 
     private void onClickAddInvoice() {
 
-        replaceFragment(invoiceInformationFragment,"InvoiceInformationFragment");
+//        replaceFragment(invoiceInformationFragment,"InvoiceInformationFragment");
+        replaceFragment(new InvoiceInformationFragment1(), "InvoiceInformationFragment");
     }
 
     private void onClickShowChart() {
@@ -95,6 +96,7 @@ public class HomeFragment extends Fragment {
     }
 
     private void onClickShowHistory() {
+        replaceFragment(new HistoryFragment(), "HistoryFragment");
     }
 
     private void onClickShowFavorite() {

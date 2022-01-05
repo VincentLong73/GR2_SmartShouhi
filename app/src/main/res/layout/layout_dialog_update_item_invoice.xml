@@ -26,6 +26,24 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
             android:hint="New Seller"/>
+        <EditText
+            android:id="@+id/edt_update_address"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:hint="New Address"/>
+        <EditText
+            android:id="@+id/edt_update_total_cost"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:hint="New Total Cost"/>
+        <EditText
+            android:id="@+id/edt_update_timestamp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:hint="New Timestamp"/>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -42,7 +60,7 @@
                 android:text="Cancel"/>
 
             <Button
-                android:id="@+id/btn_update_seller"
+                android:id="@+id/btn_update"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
