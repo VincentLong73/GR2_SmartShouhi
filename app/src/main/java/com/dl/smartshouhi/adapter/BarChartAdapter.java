@@ -2,9 +2,11 @@ package com.dl.smartshouhi.adapter;
 
 import android.content.Context;
 import android.graphics.Typeface;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -17,6 +19,9 @@ import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
 import com.github.mikephil.charting.formatter.ValueFormatter;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 
@@ -29,12 +34,14 @@ public class BarChartAdapter extends RecyclerView.Adapter<BarChartAdapter.BarCha
     private final List<BarData> barDataList;
     private String[] xLabels;
     private Context context;
+    private int yearSelected;
 
 
-    public BarChartAdapter(List<BarData> barDataList, Context context, String[] xLabels) {
+    public BarChartAdapter(List<BarData> barDataList, Context context, String[] xLabels, int yearSelected) {
         this.barDataList = barDataList;
         this.xLabels = xLabels;
         this.context = context;
+        this.yearSelected = yearSelected;
     }
 
 
@@ -47,6 +54,38 @@ public class BarChartAdapter extends RecyclerView.Adapter<BarChartAdapter.BarCha
 
     @Override
     public void onBindViewHolder(@NonNull BarChartAdapter.BarChartViewHolder holder, int position) {
+
+
+        if(xLabels.length == 7){
+            String tvTime = "";
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+            Calendar dateSunday = Calendar.getInstance();
+
+            if (position == 51) {
+                position = 1;
+            } else {
+                position += 1;
+            }
+
+
+            dateSunday.set(Calendar.YEAR,yearSelected);
+            dateSunday.set(Calendar.WEEK_OF_YEAR,position);
+            Log.e("Sunday WEEK_OF_YEAR", dateSunday.get(Calendar.WEEK_OF_YEAR)+"");
+            dateSunday.set(Calendar.DAY_OF_WEEK,1);
+
+
+            Calendar dateSaturday = Calendar.getInstance();
+
+            dateSaturday.set(Calendar.YEAR,yearSelected);
+            dateSaturday.set(Calendar.WEEK_OF_YEAR,position);
+            Log.e("Saturday WEEK_OF_YEAR", dateSaturday.get(Calendar.WEEK_OF_YEAR)+"");
+            dateSaturday.set(Calendar.DAY_OF_WEEK,7);
+
+
+            tvTime = dateFormat.format(dateSunday.getTime())+" -> "+dateFormat.format(dateSaturday.getTime());
+
+            holder.tvTime.setText(tvTime);
+        }
 
         holder.chart.setTag(holder);
         holder.chart.getDescription().setEnabled(false);
@@ -91,9 +130,11 @@ public class BarChartAdapter extends RecyclerView.Adapter<BarChartAdapter.BarCha
 
     public static class BarChartViewHolder extends RecyclerView.ViewHolder{
         private final BarChart chart;
+        private final TextView tvTime;
         public BarChartViewHolder(@NonNull View itemView) {
             super(itemView);
             chart = itemView.findViewById(R.id.item_bar_chart);
+            tvTime = itemView.findViewById(R.id.tv_time);
         }
     }
 }

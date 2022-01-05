@@ -5,6 +5,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -25,9 +29,11 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Year;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 public class ChartFragment extends Fragment {
@@ -41,13 +47,17 @@ public class ChartFragment extends Fragment {
     private List<Invoice> invoiceList;
     private Float[][] totalCostOfListInvoiceWeek;
     private Float[][] totalCostOfListInvoiceYear;
+    private ArrayAdapter<String> spinnerAdapter;
 
     private View mView;
     private SwitchMaterial btnSwitch;
+    private Spinner spinnerYear;
 
     private long totalUser;
     private int indexUserCurrent;
     private int totalInvoice;
+    private int yearSelected ;
+    private List<String> listYear;
 
 
 
@@ -65,10 +75,24 @@ public class ChartFragment extends Fragment {
         getTotalUserOnFb();
 
         btnSwitch.setOnCheckedChangeListener((compoundButton, b) -> {
-            if(btnSwitch.isChecked()){
-                replaceFragmentChart(totalCostOfListInvoiceYear,MONTHS,MAX_X_VALUE_MONTH);
-            }else{
-                replaceFragmentChart(totalCostOfListInvoiceWeek,DAYS,MAX_X_VALUE);
+            getTotalUserOnFb();
+//            if(btnSwitch.isChecked()){
+//                replaceFragmentChart(totalCostOfListInvoiceYear,MONTHS,MAX_X_VALUE_MONTH);
+//            }else{
+//                replaceFragmentChart(totalCostOfListInvoiceWeek,DAYS,MAX_X_VALUE);
+//            }
+        });
+
+        spinnerYear.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                yearSelected = Integer.parseInt(spinnerAdapter.getItem(position));
+                getTotalUserOnFb();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
             }
         });
 
@@ -80,24 +104,42 @@ public class ChartFragment extends Fragment {
     private void initUI() {
 
         invoiceList = new ArrayList<>();
+
+        initTotalCostOfListInvoiceWeek();
+        initTotalCostOfListInvoiceYear();
+
+        btnSwitch = mView.findViewById(R.id.btn_switch);
+
+        spinnerYear = mView.findViewById(R.id.spinner_year);
+
+        spinnerAdapter = new ArrayAdapter(getContext(), android.R.layout.simple_spinner_item,listYear);
+        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerYear.setAdapter(spinnerAdapter);
+        yearSelected = Integer.parseInt(spinnerAdapter.getItem(0));
+
+    }
+
+    private void initTotalCostOfListInvoiceWeek(){
         totalCostOfListInvoiceWeek = new Float[52][7];
         for(int i = 0;i<52 ; i ++){
             Arrays.fill(totalCostOfListInvoiceWeek[i], 0f);
         }
+    }
+
+    private void initTotalCostOfListInvoiceYear(){
         int year = Calendar.getInstance().get(Calendar.YEAR);
-        int numberYear = year - 2020 + 1;
+        int numberYear = year - 2020 +1 ;
+        listYear = new ArrayList<>();
 
         Log.e("Check Year",year+"-"+numberYear);
 
         totalCostOfListInvoiceYear = new Float[numberYear][12];
         for(int i = 0;i<numberYear ; i ++){
             Arrays.fill(totalCostOfListInvoiceYear[i], 0f);
+            listYear.add(2020 + i +"");
         }
-
-        btnSwitch = mView.findViewById(R.id.btn_switch);
-
-
     }
+
 
     private void getTotalUserOnFb(){
         FirebaseDatabase database = FirebaseDatabase.getInstance("https://smart-shouhi-default-rtdb.asia-southeast1.firebasedatabase.app/");
@@ -156,9 +198,17 @@ public class ChartFragment extends Fragment {
                     }
                 }
 
-                processingDataWeek();
-                processingDataYear();
-                replaceFragmentChart(totalCostOfListInvoiceWeek,DAYS,MAX_X_VALUE);
+//                processingDataWeek();
+//                processingDataYear();
+                if(btnSwitch.isChecked()){
+                    processingDataYear();
+                    replaceFragmentChart(totalCostOfListInvoiceYear,MONTHS,MAX_X_VALUE_MONTH);
+                }else{
+                    processingDataWeek();
+                    replaceFragmentChart(totalCostOfListInvoiceWeek,DAYS,MAX_X_VALUE);
+                }
+
+//                replaceFragmentChart(totalCostOfListInvoiceWeek,DAYS,MAX_X_VALUE);
             }
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
@@ -167,15 +217,25 @@ public class ChartFragment extends Fragment {
     }
 
     private void processingDataWeek() {
+        //Khoi tao mang list invoice
+        initTotalCostOfListInvoiceWeek();
+
         for(Invoice invoice : invoiceList){
 
             Calendar calendar = Calendar.getInstance();
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
             try {
                 calendar.setTime(dateFormat.parse(invoice.getTimestamp()));
-                int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
-                int weekOfYear = calendar.get(Calendar.WEEK_OF_YEAR);
-                totalCostOfListInvoiceWeek[weekOfYear-1][dayOfWeek-1] += invoice.getTotalCost();
+                if(calendar.get(Calendar.YEAR) == yearSelected) {
+                    int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
+                    int weekOfYear = calendar.get(Calendar.WEEK_OF_YEAR);
+                    if (weekOfYear == 1) {
+                        weekOfYear = 52;
+                    } else {
+                        weekOfYear -= 1;
+                    }
+                    totalCostOfListInvoiceWeek[weekOfYear - 1][dayOfWeek - 1] += invoice.getTotalCost();
+                }
             } catch (ParseException e) {
                 e.printStackTrace();
             }
@@ -183,15 +243,21 @@ public class ChartFragment extends Fragment {
 
     }
     private void processingDataYear() {
+
+        //Khoi tao mang list invoice
+        initTotalCostOfListInvoiceYear();
+
         for(Invoice invoice : invoiceList){
 
             Calendar calendar = Calendar.getInstance();
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
             try {
                 calendar.setTime(dateFormat.parse(invoice.getTimestamp()));
+
                 int month = calendar.get(Calendar.MONTH);
                 int year = calendar.get(Calendar.YEAR);
                 totalCostOfListInvoiceYear[year - 2020][month] += invoice.getTotalCost();
+
             } catch (ParseException e) {
                 e.printStackTrace();
             }
@@ -203,7 +269,7 @@ public class ChartFragment extends Fragment {
 
         FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
         transaction.replace(R.id.fragment_show_chart,
-                new BarChartFragment(xLabels,totalCostOfListInVoice,maxXAxis),
+                new BarChartFragment(xLabels,maxXAxis,totalCostOfListInVoice,yearSelected),
                 "Bar Chart Fragment");
         transaction.commit();
     }

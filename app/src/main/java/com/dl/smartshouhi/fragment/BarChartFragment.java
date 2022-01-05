@@ -1,12 +1,16 @@
 package com.dl.smartshouhi.fragment;
 
+import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager2.widget.CompositePageTransformer;
 import androidx.viewpager2.widget.MarginPageTransformer;
@@ -19,7 +23,9 @@ import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 public class BarChartFragment extends Fragment {
@@ -28,29 +34,57 @@ public class BarChartFragment extends Fragment {
     private String[] xLabels;
     private int maxXAxis;
     private Float[][] totalCostOfListInvoice;
+    private int yearSelected;
 
-    public BarChartFragment(String[] xLabels, Float[][] totalCostOfListInvoice, int maxXAxis) {
+
+    public BarChartFragment(String[] xLabels, int maxXAxis, Float[][] totalCostOfListInvoice, int yearSelected) {
         this.xLabels = xLabels;
-        this.totalCostOfListInvoice = totalCostOfListInvoice;
         this.maxXAxis = maxXAxis;
+        this.totalCostOfListInvoice = totalCostOfListInvoice;
+        this.yearSelected = yearSelected;
     }
+
     private View mView;
     private ViewPager2 viewPager;
     private BarChartAdapter barChartAdapter;
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
         mView = inflater.inflate(R.layout.fragment_bar_chart_child, container, false);
         initUI();
+
         return mView;
     }
+
 
     private void initUI() {
         viewPager = mView.findViewById(R.id.view_pager_show_bar_chart_in_fragment);
         setBarChartAdapter();
+
+
+        int position;
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.YEAR, yearSelected);
+        if(maxXAxis == 7){
+            int weekOfYear = calendar.get(Calendar.WEEK_OF_YEAR);
+            Log.e("Year ",  weekOfYear+"");
+            if(weekOfYear == 1){
+                weekOfYear = 52;
+            }else {
+                weekOfYear -= 1;
+            }
+            position = weekOfYear -1;
+        }else{
+            int year = yearSelected - 2020;
+            position = year;
+        }
+        viewPager.setCurrentItem(position);
     }
+
+
 
     private List<BarData> generateData() {
 
@@ -91,7 +125,7 @@ public class BarChartFragment extends Fragment {
         });
         viewPager.setPageTransformer(compositePageTransformer);
 
-        barChartAdapter = new BarChartAdapter(generateData(), getContext(), xLabels);
+        barChartAdapter = new BarChartAdapter(generateData(), getContext(), xLabels, yearSelected);
         viewPager.setAdapter(barChartAdapter);
     }
 
