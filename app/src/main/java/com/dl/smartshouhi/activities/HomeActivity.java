@@ -48,6 +48,7 @@ public class HomeActivity extends AppCompatActivity {
     private BottomNavigationView bottomNavigationView;
     private TextView tvTitleToolbar;
     private Menu mOptionsMenu;
+    private Toolbar toolbar;
 
 
 
@@ -93,9 +94,10 @@ public class HomeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
+
         initUI();
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+//        Toolbar toolbar = findViewById(R.id.toolbar);
+        //setSupportActionBar(toolbar);
         setTitleToolbar();
         selectItemInBottomNavigation();
     }
@@ -103,7 +105,17 @@ public class HomeActivity extends AppCompatActivity {
 
     private void initUI() {
 
-        tvTitleToolbar = findViewById(R.id.toolbar_title);
+        toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        //setSupportActionBar(toolbar);
+        //((AppCompatActivity) HomeActivity.this).setSupportActionBar(toolbar);
+
+        //toolbar =(Toolbar) findViewById(R.id.toolbar);
+//        tvTitleToolbar = (TextView) toolbar.findViewById(R.id.toolbar_title_home);
+//        tvTitleToolbar.setText("hihi");
+
+//        getSupportActionBar().setDisplayShowTitleEnabled(false);
+
         bottomNavigationView = findViewById(R.id.bottom_nav);
 
         replaceFragment(homeFragment ,FRAGMENT_HOME);
@@ -124,7 +136,8 @@ public class HomeActivity extends AppCompatActivity {
         }
 
         if(getSupportActionBar() != null){
-            tvTitleToolbar.setText(title);
+//            tvTitleToolbar.setText(title);
+            getSupportActionBar().setTitle(title);
         }
     }
 

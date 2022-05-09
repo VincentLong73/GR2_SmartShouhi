@@ -1,6 +1,8 @@
 package com.dl.smartshouhi.fragment;
 
 import android.app.Dialog;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -21,6 +23,11 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.dl.smartshouhi.R;
 import com.dl.smartshouhi.adapter.InvoiceAdapter;
 import com.dl.smartshouhi.model.Invoice;
@@ -42,9 +49,20 @@ import com.google.firebase.database.DatabaseException;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.gson.Gson;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import static com.dl.smartshouhi.constaint.Constaint.ID_KEY;
+import static com.dl.smartshouhi.constaint.Constaint.SHARED_PREFS;
+import static com.dl.smartshouhi.constaint.Constaint.URL_GET_INVOICE_BY_USER_ID;
 
 public class HistoryFragment extends Fragment {
 
@@ -69,7 +87,8 @@ public class HistoryFragment extends Fragment {
         mView = inflater.inflate(R.layout.fragment_history, container, false);
 
         initUI();
-        getTotalUserOnFb();
+        processingData();
+        //getTotalUserOnFb();
 
         return mView;
     }
@@ -90,12 +109,7 @@ public class HistoryFragment extends Fragment {
     }
 
     private void initRecycleView(){
-        invoiceAdapter = new InvoiceAdapter(invoiceList, new InvoiceAdapter.IClickListener() {
-            @Override
-            public void onClickUpdateItem(Invoice invoice, int position) {
-                openDialogUpdateItem(invoice, position);
-            }
-        });
+        invoiceAdapter = new InvoiceAdapter(invoiceList, (invoice, position) -> openDialogUpdateItem(invoice, position));
         rcvInvoices.setAdapter(invoiceAdapter);
     }
 
@@ -268,5 +282,43 @@ public class HistoryFragment extends Fragment {
 
     public void setIndexUserCurrent(int indexUserCurrent) {
         this.indexUserCurrent = indexUserCurrent;
+    }
+
+
+    private void processingData() {
+        SharedPreferences sharedpreferences;
+        int userId;
+        RequestQueue requestQueue;
+        requestQueue = Volley.newRequestQueue(getActivity());
+        invoiceList.clear();
+
+        sharedpreferences = this.getActivity().getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
+
+        // getting data from shared prefs and
+        // storing it in our string variable.
+        userId = sharedpreferences.getInt(ID_KEY, -1);
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, URL_GET_INVOICE_BY_USER_ID+userId, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+
+                Gson gson = new Gson();
+                invoiceList = Arrays.asList(gson.fromJson(response, Invoice[].class));
+
+                initRecycleView();
+
+            }
+        }, error -> {
+
+        }){
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String,String> params = new HashMap<>();
+
+                return params;
+            }
+        };
+
+        requestQueue.add(stringRequest);
+
     }
 }

@@ -1,5 +1,8 @@
+
 package com.dl.smartshouhi.fragment;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -9,33 +12,35 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.Switch;
-import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.dl.smartshouhi.R;
 import com.dl.smartshouhi.model.Invoice;
-import com.dl.smartshouhi.model.User;
-import com.google.android.material.switchmaterial.SwitchMaterial;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseException;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
+import com.google.gson.Gson;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.Year;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import static com.dl.smartshouhi.constaint.Constaint.ID_KEY;
+import static com.dl.smartshouhi.constaint.Constaint.SHARED_PREFS;
+import static com.dl.smartshouhi.constaint.Constaint.URL_GET_INVOICE_BY_USER_ID;
+import static com.dl.smartshouhi.constaint.Constaint.URL_GET_INVOICE_BY_USER_ID_YEAR;
 
 public class ChartFragment extends Fragment {
     private static final int MAX_X_VALUE = 7;
@@ -57,9 +62,12 @@ public class ChartFragment extends Fragment {
 
     private long totalUser;
     private int indexUserCurrent;
-    private int totalInvoice;
+//    private int totalInvoice;
     private int yearSelected ;
     private List<String> listYear;
+
+    private SharedPreferences sharedpreferences;
+    private int userId;
 
 
 
@@ -74,22 +82,43 @@ public class ChartFragment extends Fragment {
 
         initUI();
 
-        getTotalUserOnFb();
+//        getTotalUserOnFb();
+
+        if(btnSwitch.isChecked()){
+            processingDataYear();
+            //replaceFragmentChart(totalCostOfListInvoiceYear,MONTHS,MAX_X_VALUE_MONTH);
+        }else{
+            processingDataWeek();
+            //replaceFragmentChart(totalCostOfListInvoiceWeek,DAYS,MAX_X_VALUE);
+        }
 
         btnSwitch.setOnCheckedChangeListener((compoundButton, b) -> {
-            getTotalUserOnFb();
-//            if(btnSwitch.isChecked()){
-//                replaceFragmentChart(totalCostOfListInvoiceYear,MONTHS,MAX_X_VALUE_MONTH);
-//            }else{
-//                replaceFragmentChart(totalCostOfListInvoiceWeek,DAYS,MAX_X_VALUE);
-//            }
+//            processingDataYear();
+//            replaceFragmentChart(totalCostOfListInvoiceYear,MONTHS,MAX_X_VALUE_MONTH);
+
+//            getTotalUserOnFb();
+            if(btnSwitch.isChecked()){
+                processingDataYear();
+                //replaceFragmentChart(totalCostOfListInvoiceYear,MONTHS,MAX_X_VALUE_MONTH);
+            }else{
+                processingDataWeek();
+                //replaceFragmentChart(totalCostOfListInvoiceWeek,DAYS,MAX_X_VALUE);
+            }
         });
 
         spinnerYear.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 yearSelected = Integer.parseInt(spinnerAdapter.getItem(position));
-                getTotalUserOnFb();
+//                getTotalUserOnFb();
+                if(btnSwitch.isChecked()){
+                    processingDataYear();
+                    //replaceFragmentChart(totalCostOfListInvoiceYear,MONTHS,MAX_X_VALUE_MONTH);
+                }else{
+                    processingDataWeek();
+                    //replaceFragmentChart(totalCostOfListInvoiceWeek,DAYS,MAX_X_VALUE);
+                }
+
             }
 
             @Override
@@ -143,127 +172,246 @@ public class ChartFragment extends Fragment {
     }
 
 
-    private void getTotalUserOnFb(){
-        FirebaseDatabase database = FirebaseDatabase.getInstance("https://smart-shouhi-default-rtdb.asia-southeast1.firebasedatabase.app/");
-        DatabaseReference myRef = database.getReference();
-        myRef.child("totalUser").get().addOnCompleteListener(task -> {
-            if(task.isSuccessful()){
-                setTotalUser((Long) Long.parseLong(String.valueOf(task.getResult().getValue())));
-                getIdUserCurrent();
-            }
-        });
-    }
-
-    private void getIdUserCurrent(){
-        FirebaseAuth mAuth = FirebaseAuth.getInstance();
-        User user = new User(mAuth.getCurrentUser().getEmail());
-
-        FirebaseDatabase database = FirebaseDatabase.getInstance("https://smart-shouhi-default-rtdb.asia-southeast1.firebasedatabase.app/");
-        DatabaseReference myRef = database.getReference();
-
-        for(int i = 0 ; i<getTotalUser() ; i++){
-            int finalI = i;
-            myRef.child(i+"").child("email").get().addOnCompleteListener(task -> {
-
-                if(task.isSuccessful()){
-                    String email = String.valueOf(task.getResult().getValue());
-                    if(email.equals(user.getEmail())){
-                        setIndexUserCurrent(finalI);
-                        getListInvoiceDatabase();
-                    }
-
-                }
-            });
-        }
-    }
-
-    private void getListInvoiceDatabase(){
-
-
-        FirebaseDatabase database = FirebaseDatabase.getInstance("https://smart-shouhi-default-rtdb.asia-southeast1.firebasedatabase.app/");
-        DatabaseReference myRef = database.getReference(getIndexUserCurrent()+"/invoices");
-
-        myRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                invoiceList.clear();
-                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                    try {
-                        Invoice invoice = dataSnapshot.getValue(Invoice.class);
-                        if (invoice != null) {
-                            invoiceList.add(invoice);
-                        }
-                    } catch (DatabaseException e) {
-                        if(dataSnapshot.getKey().equals("totalInvoice")){
-                            totalInvoice = dataSnapshot.getValue(Integer.class);
-                        }
-                    }
-                }
-
-//                processingDataWeek();
-//                processingDataYear();
-                if(btnSwitch.isChecked()){
-                    processingDataYear();
-                    replaceFragmentChart(totalCostOfListInvoiceYear,MONTHS,MAX_X_VALUE_MONTH);
-                }else{
-                    processingDataWeek();
-                    replaceFragmentChart(totalCostOfListInvoiceWeek,DAYS,MAX_X_VALUE);
-                }
-
-//                replaceFragmentChart(totalCostOfListInvoiceWeek,DAYS,MAX_X_VALUE);
-            }
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-            }
-        });
-    }
+//    private void getTotalUserOnFb(){
+//        FirebaseDatabase database = FirebaseDatabase.getInstance("https://smart-shouhi-default-rtdb.asia-southeast1.firebasedatabase.app/");
+//        DatabaseReference myRef = database.getReference();
+//        myRef.child("totalUser").get().addOnCompleteListener(task -> {
+//            if(task.isSuccessful()){
+//                setTotalUser((Long) Long.parseLong(String.valueOf(task.getResult().getValue())));
+//                getIdUserCurrent();
+//            }
+//        });
+//    }
+//
+//    private void getIdUserCurrent(){
+//        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+//        User user = new User(mAuth.getCurrentUser().getEmail());
+//
+//        FirebaseDatabase database = FirebaseDatabase.getInstance("https://smart-shouhi-default-rtdb.asia-southeast1.firebasedatabase.app/");
+//        DatabaseReference myRef = database.getReference();
+//
+//        for(int i = 0 ; i<getTotalUser() ; i++){
+//            int finalI = i;
+//            myRef.child(i+"").child("email").get().addOnCompleteListener(task -> {
+//
+//                if(task.isSuccessful()){
+//                    String email = String.valueOf(task.getResult().getValue());
+//                    if(email.equals(user.getEmail())){
+//                        setIndexUserCurrent(finalI);
+//                        getListInvoiceDatabase();
+//                    }
+//
+//                }
+//            });
+//        }
+//    }
+//
+//    private void getListInvoiceDatabase(){
+//
+//
+//        FirebaseDatabase database = FirebaseDatabase.getInstance("https://smart-shouhi-default-rtdb.asia-southeast1.firebasedatabase.app/");
+//        DatabaseReference myRef = database.getReference(getIndexUserCurrent()+"/invoices");
+//
+//        myRef.addListenerForSingleValueEvent(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                invoiceList.clear();
+//                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+//                    try {
+//                        Invoice invoice = dataSnapshot.getValue(Invoice.class);
+//                        if (invoice != null) {
+//                            invoiceList.add(invoice);
+//                        }
+//                    } catch (DatabaseException e) {
+//                        if(dataSnapshot.getKey().equals("totalInvoice")){
+//                            totalInvoice = dataSnapshot.getValue(Integer.class);
+//                        }
+//                    }
+//                }
+//
+////                processingDataWeek();
+////                processingDataYear();
+//                if(btnSwitch.isChecked()){
+//                    processingDataYear();
+//                    replaceFragmentChart(totalCostOfListInvoiceYear,MONTHS,MAX_X_VALUE_MONTH);
+//                }else{
+//                    processingDataWeek();
+//                    replaceFragmentChart(totalCostOfListInvoiceWeek,DAYS,MAX_X_VALUE);
+//                }
+//
+////                replaceFragmentChart(totalCostOfListInvoiceWeek,DAYS,MAX_X_VALUE);
+//            }
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError error) {
+//            }
+//        });
+//    }
 
     private void processingDataWeek() {
-        //Khoi tao mang list invoice
+        RequestQueue requestQueue;
+        requestQueue = Volley.newRequestQueue(getActivity());
         initTotalCostOfListInvoiceWeek();
 
-        for(Invoice invoice : invoiceList){
+        sharedpreferences = this.getActivity().getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
 
-            Calendar calendar = Calendar.getInstance();
-            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-            try {
-                calendar.setTime(dateFormat.parse(invoice.getTimestamp()));
-                if(calendar.get(Calendar.YEAR) == yearSelected) {
-                    int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
-                    int weekOfYear = calendar.get(Calendar.WEEK_OF_YEAR);
-                    if (weekOfYear == 1) {
-                        weekOfYear = 52;
-                    } else {
-                        weekOfYear -= 1;
+        // getting data from shared prefs and
+        // storing it in our string variable.
+        userId = sharedpreferences.getInt(ID_KEY, -1);
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, URL_GET_INVOICE_BY_USER_ID+userId, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+
+                Gson gson = new Gson();
+                invoiceList = Arrays.asList(gson.fromJson(response, Invoice[].class));
+
+                if(invoiceList.size() > 0){
+
+                    for(Invoice invoice : invoiceList) {
+                        Calendar calendar = Calendar.getInstance();
+//                        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+                        SimpleDateFormat dateFormat1 = new SimpleDateFormat("yyyy-MM-dd");
+                        SimpleDateFormat dateFormat2 = new SimpleDateFormat("dd/MM/yyyy");
+                        try {
+                            String strDate = dateFormat2.format(dateFormat1.parse(invoice.getTimestamp()));
+//                            calendar.setTime(dateFormat.parse(invoice.getTimestamp()));
+                            calendar.setTime(dateFormat2.parse(strDate));
+                            if (calendar.get(Calendar.YEAR) == yearSelected) {
+                                int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
+                                int weekOfYear = calendar.get(Calendar.WEEK_OF_YEAR);
+                                if (weekOfYear == 1) {
+                                    weekOfYear = 52;
+                                } else {
+                                    weekOfYear -= 1;
+                                }
+                                totalCostOfListInvoiceWeek[weekOfYear - 1][dayOfWeek - 1] += invoice.getTotalCost();
+                            }
+                        }catch (ParseException e) {
+                            e.printStackTrace();
+                        }
                     }
-                    totalCostOfListInvoiceWeek[weekOfYear - 1][dayOfWeek - 1] += invoice.getTotalCost();
+
+                    replaceFragmentChart(totalCostOfListInvoiceYear,MONTHS,MAX_X_VALUE_MONTH);
+
+                }else {
+                    // If sign in fails, display a message to the user.
+                    Toast.makeText(getActivity(), "Authentication failed.", Toast.LENGTH_SHORT).show();
                 }
-            } catch (ParseException e) {
-                e.printStackTrace();
+
             }
-        }
+        }, error -> {
+
+        }){
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String,String> params = new HashMap<>();
+
+                return params;
+            }
+        };
+
+        requestQueue.add(stringRequest);
+
+        //Khoi tao mang list invoice
+//        initTotalCostOfListInvoiceWeek();
+//
+//        for(Invoice invoice : invoiceList){
+//
+//            Calendar calendar = Calendar.getInstance();
+//            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+//            try {
+//                calendar.setTime(dateFormat.parse(invoice.getTimestamp()));
+//                if(calendar.get(Calendar.YEAR) == yearSelected) {
+//                    int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
+//                    int weekOfYear = calendar.get(Calendar.WEEK_OF_YEAR);
+//                    if (weekOfYear == 1) {
+//                        weekOfYear = 52;
+//                    } else {
+//                        weekOfYear -= 1;
+//                    }
+//                    totalCostOfListInvoiceWeek[weekOfYear - 1][dayOfWeek - 1] += invoice.getTotalCost();
+//                }
+//            } catch (ParseException e) {
+//                e.printStackTrace();
+//            }
+//        }
 
     }
     private void processingDataYear() {
 
+        RequestQueue requestQueue;
+        requestQueue = Volley.newRequestQueue(getActivity());
+
+
         //Khoi tao mang list invoice
         initTotalCostOfListInvoiceYear();
+        sharedpreferences = this.getActivity().getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
 
-        for(Invoice invoice : invoiceList){
+        // getting data from shared prefs and
+        // storing it in our string variable.
+        userId = sharedpreferences.getInt(ID_KEY, -1);
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, URL_GET_INVOICE_BY_USER_ID_YEAR+"id="+userId+"&"+"year="+yearSelected, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
 
-            Calendar calendar = Calendar.getInstance();
-            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-            try {
-                calendar.setTime(dateFormat.parse(invoice.getTimestamp()));
+                Gson gson = new Gson();
+                invoiceList = Arrays.asList(gson.fromJson(response, Invoice[].class));
 
-                int month = calendar.get(Calendar.MONTH);
-                int year = calendar.get(Calendar.YEAR);
-                totalCostOfListInvoiceYear[year - 2020][month] += invoice.getTotalCost();
+                if(invoiceList.size() > 0){
+                    for(Invoice invoice : invoiceList) {
+                        Calendar calendar = Calendar.getInstance();
+//                        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+                        SimpleDateFormat dateFormat1 = new SimpleDateFormat("yyyy-MM-dd");
+                        SimpleDateFormat dateFormat2 = new SimpleDateFormat("dd/MM/yyyy");
+                        try {
+                            String strDate = dateFormat2.format(dateFormat1.parse(invoice.getTimestamp()));
+//                            calendar.setTime(dateFormat.parse(invoice.getTimestamp()));
+                            calendar.setTime(dateFormat2.parse(strDate));
 
-            } catch (ParseException e) {
-                e.printStackTrace();
+                            int month = calendar.get(Calendar.MONTH);
+                            int year = calendar.get(Calendar.YEAR);
+                            float total = invoice.getTotalCost();
+                            totalCostOfListInvoiceYear[year - 2020][month] += invoice.getTotalCost();
+
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    replaceFragmentChart(totalCostOfListInvoiceWeek,DAYS,MAX_X_VALUE);
+
+                }else {
+                    // If sign in fails, display a message to the user.
+                    Toast.makeText(getActivity(), "Authentication failed.", Toast.LENGTH_SHORT).show();
+                }
+
             }
-        }
+        }, error -> {
+
+        }){
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String,String> params = new HashMap<>();
+
+                return params;
+            }
+        };
+        requestQueue.add(stringRequest);
+
+//        for(Invoice invoice : invoiceList){
+//
+//            Calendar calendar = Calendar.getInstance();
+//            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+//            try {
+//                calendar.setTime(dateFormat.parse(invoice.getTimestamp()));
+//
+//                int month = calendar.get(Calendar.MONTH);
+//                int year = calendar.get(Calendar.YEAR);
+//                totalCostOfListInvoiceYear[year - 2020][month] += invoice.getTotalCost();
+//
+//            } catch (ParseException e) {
+//                e.printStackTrace();
+//            }
+//        }
     }
 
     private void replaceFragmentChart(Float[][] totalCostOfListInVoice,String[] xLabels,  int maxXAxis){

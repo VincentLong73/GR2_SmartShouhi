@@ -4,7 +4,7 @@
 
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
@@ -14,15 +14,15 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.SmartShouhi">
-        <activity android:name=".activities.HomeActivity"/>
-        <activity android:name=".activities.SignInActivity"/>
-        <activity android:name=".activities.SignUpActivity"/>
-        <activity android:name=".activities.TestSelectMultiImage"/>
-        <activity android:name=".activities.SplashActivity"
+        <activity android:name=".activities.HomeActivity" />
+        <activity android:name=".activities.SignInActivity" />
+        <activity android:name=".activities.SignUpActivity" />
+        <activity android:name=".activities.TestSelectMultiImage" />
+        <activity
+            android:name=".activities.SplashActivity"
             android:theme="@style/SplashScreenTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

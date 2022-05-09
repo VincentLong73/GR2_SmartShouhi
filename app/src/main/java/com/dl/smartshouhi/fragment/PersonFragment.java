@@ -3,7 +3,9 @@ package com.dl.smartshouhi.fragment;
 import android.Manifest;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -40,6 +42,11 @@ import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
+
+import static com.dl.smartshouhi.constaint.Constaint.EMAIL_KEY;
+import static com.dl.smartshouhi.constaint.Constaint.FULLNAME_KEY;
+import static com.dl.smartshouhi.constaint.Constaint.SHARED_PREFS;
+import static com.dl.smartshouhi.constaint.Constaint.USERNAME_KEY;
 
 public class PersonFragment extends Fragment implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -186,21 +193,44 @@ public class PersonFragment extends Fragment implements NavigationView.OnNavigat
     }
 
     private void setUserInformation(){
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        if(user == null){
+
+        SharedPreferences sharedpreferences;
+        String email, fullName, userName;
+
+        sharedpreferences = this.getActivity().getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
+
+        // getting data from shared prefs and
+        // storing it in our string variable.
+        email = sharedpreferences.getString(EMAIL_KEY, "");
+        fullName = sharedpreferences.getString(FULLNAME_KEY, "");
+        userName = sharedpreferences.getString(USERNAME_KEY, "");
+
+//        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+//        if(user == null){
+//            return;
+//        }
+//        Toast.makeText(getActivity(),"Hi "+user.getDisplayName(),Toast.LENGTH_LONG).show();
+
+        if(email == null){
             return;
         }
-        Toast.makeText(getActivity(),"Hi "+user.getDisplayName(),Toast.LENGTH_LONG).show();
 
-        tvFullName.setText(user.getDisplayName());
-        tvEmail.setText(user.getEmail());
-        tvEmailHeader.setText(user.getEmail());
-        tvUsernameHeader.setText(user.getDisplayName());
+        tvFullName.setText(fullName);
+        tvEmail.setText(email);
+        tvEmailHeader.setText(email);
+        tvUsernameHeader.setText(userName);
 
-        uri = user.getPhotoUrl();
 
-        Glide.with(getActivity()).load(user.getPhotoUrl()).error(R.drawable.ic_avatar_default).into(imgAvatar);
-        Glide.with(getActivity()).load(user.getPhotoUrl()).error(R.drawable.ic_avatar_default).into(imgAvatarHeader);
+
+//        tvFullName.setText(user.getDisplayName());
+//        tvEmail.setText(user.getEmail());
+//        tvEmailHeader.setText(user.getEmail());
+//        tvUsernameHeader.setText(user.getDisplayName());
+
+//        uri = user.getPhotoUrl();
+//
+//        Glide.with(getActivity()).load(user.getPhotoUrl()).error(R.drawable.ic_avatar_default).into(imgAvatar);
+//        Glide.with(getActivity()).load(user.getPhotoUrl()).error(R.drawable.ic_avatar_default).into(imgAvatarHeader);
     }
 
     private void initListener() {
