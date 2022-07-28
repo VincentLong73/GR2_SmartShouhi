@@ -1,6 +1,8 @@
-package com.dl.smartshouhi.activities;
+package com.dl.smartshouhi.activity;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -18,6 +20,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.dl.smartshouhi.R;
+import com.dl.smartshouhi.fragment.HomeAdminFragment;
 import com.dl.smartshouhi.fragment.HomeFragment;
 import com.dl.smartshouhi.fragment.InvoiceInformationFragment;
 import com.dl.smartshouhi.fragment.InvoiceInformationFragment1;
@@ -28,6 +31,11 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import java.io.IOException;
 import java.util.Objects;
 
+import static com.dl.smartshouhi.constaint.Constant.EMAIL_KEY;
+import static com.dl.smartshouhi.constaint.Constant.ISADMIN_KEY;
+import static com.dl.smartshouhi.constaint.Constant.PASSWORD_KEY;
+import static com.dl.smartshouhi.constaint.Constant.SHARED_PREFS;
+
 public class HomeActivity extends AppCompatActivity {
 
 
@@ -35,20 +43,24 @@ public class HomeActivity extends AppCompatActivity {
     final private PersonFragment personFragment = new PersonFragment();
     final private InvoiceInformationFragment invoiceInformationFragment = new InvoiceInformationFragment();
     final private HomeFragment homeFragment = new HomeFragment(invoiceInformationFragment);
+    final private HomeAdminFragment homeAdminFragment = new HomeAdminFragment();
 
     public static final int MY_REQUEST_CODE = 311;
     private static final String FRAGMENT_INVOICE_INFORMATION = "InvoiceInformationFragment";
     private static final String FRAGMENT_PERSON = "PersonFragment";
     private static final String FRAGMENT_HOME = "HomeFragment";
     private static final String FRAGMENT_ABOUT_US = "AboutUsFragment";
+    private static final String FRAGMENT_HOME_ADMIN = "HomeAdminFragment";
 
     private String currentFragment;
+    private SharedPreferences sharedpreferences;
 
 
     private BottomNavigationView bottomNavigationView;
     private TextView tvTitleToolbar;
     private Menu mOptionsMenu;
     private Toolbar toolbar;
+    private Boolean isAdmin = false;
 
 
 
@@ -107,6 +119,7 @@ public class HomeActivity extends AppCompatActivity {
 
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        bottomNavigationView = findViewById(R.id.bottom_nav);
         //setSupportActionBar(toolbar);
         //((AppCompatActivity) HomeActivity.this).setSupportActionBar(toolbar);
 
@@ -115,15 +128,27 @@ public class HomeActivity extends AppCompatActivity {
 //        tvTitleToolbar.setText("hihi");
 
 //        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        sharedpreferences = getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
 
-        bottomNavigationView = findViewById(R.id.bottom_nav);
+        // in shared prefs inside het string method
+        // we are passing key value as EMAIL_KEY and
+        // default value is
+        // set to null if not present.
 
-        replaceFragment(homeFragment ,FRAGMENT_HOME);
+        isAdmin = sharedpreferences.getBoolean(ISADMIN_KEY, false);
+        if(isAdmin) {
+            replaceFragment(new HomeAdminFragment(), FRAGMENT_HOME_ADMIN);
+        }else{
+            replaceFragment(homeFragment ,FRAGMENT_HOME);
+        }
     }
 
     private void setTitleToolbar(){
         String title = "";
         switch (currentFragment){
+            case FRAGMENT_HOME_ADMIN:
+                title = "Trang Admin";
+                break;
             case FRAGMENT_HOME:
                 title = "Smart Shouhi";
                 break;
@@ -145,7 +170,11 @@ public class HomeActivity extends AppCompatActivity {
         bottomNavigationView.setOnNavigationItemSelectedListener(item -> {
             switch (item.getItemId()){
                 case R.id.action_home:
-                    replaceFragment(homeFragment, FRAGMENT_HOME);
+                    if(isAdmin) {
+                        replaceFragment(homeAdminFragment, FRAGMENT_HOME_ADMIN);
+                    }else{
+                        replaceFragment(homeFragment ,FRAGMENT_HOME);
+                    }
                     break;
                 case R.id.action_person:
 //                    replaceFragment(myProfileFragment, FRAGMENT_PERSON);

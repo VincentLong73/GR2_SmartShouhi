@@ -1,6 +1,7 @@
 package com.dl.smartshouhi.fragment;
 
 import android.Manifest;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.pm.PackageManager;
@@ -33,17 +34,14 @@ import androidx.viewpager2.widget.MarginPageTransformer;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.dl.smartshouhi.R;
-import com.dl.smartshouhi.activities.HomeActivity;
+import com.dl.smartshouhi.activity.HomeActivity;
 import com.dl.smartshouhi.adapter.PhotoAdapter;
-import com.dl.smartshouhi.api.ApiService;
-import com.dl.smartshouhi.model.Invoice;
 import com.dl.smartshouhi.model.InvoiceModel;
+import com.dl.smartshouhi.model.Item;
 import com.dl.smartshouhi.model.User;
-import com.dl.smartshouhi.utils.RealPathUtil;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -65,9 +63,6 @@ import me.relex.circleindicator.CircleIndicator3;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class InvoiceInformationFragment1 extends Fragment {
 
@@ -103,6 +98,15 @@ public class InvoiceInformationFragment1 extends Fragment {
     private long totalUser;
     private int indexUserCurrent;
 
+    private Dialog dialogItem;
+    private View viewDialogItem;
+    private Button btnSaveItem;
+    private EditText edtItemName;
+    private EditText edtItemCost;
+    private List<Item> itemList;
+    private Button btnAddItem;
+    private Button btnSeeListItem;
+
 
     @Nullable
     @Override
@@ -111,7 +115,7 @@ public class InvoiceInformationFragment1 extends Fragment {
 
         initUI();
         initListener();
-
+        showDialogItem();
         return mView;
     }
 
@@ -161,6 +165,24 @@ public class InvoiceInformationFragment1 extends Fragment {
         viewPager2.setAdapter(photoAdapter1);
         circleIndicator3.setViewPager(viewPager2);
 
+        itemList = new ArrayList<>();
+        btnAddItem = mView.findViewById(R.id.btn_add_item);
+        btnSeeListItem = mView.findViewById(R.id.btn_see_list_item);
+        /*S- Bat dau khoi tao UI trong Dialog Item */
+        dialogItem = new Dialog(getActivity());
+        dialogItem.setCancelable(true);
+
+        viewDialogItem  = homeActivity.getLayoutInflater().inflate(R.layout.layout_dialog_add_item, null);
+        dialogItem.setContentView(viewDialogItem);
+
+        edtItemName = viewDialogItem.findViewById(R.id.edt_item_name);
+        edtItemCost = viewDialogItem.findViewById(R.id.edt_item_cost);
+
+        btnSaveItem = viewDialogItem.findViewById(R.id.btn_save_item);
+
+        /*E- Ket thuc khoi tao UI trong Dialog Item */
+
+
     }
 
     private void initListener() {
@@ -171,14 +193,45 @@ public class InvoiceInformationFragment1 extends Fragment {
             mergeListImages();
                 callApi();
         });
-        btnSaveInfo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                saveInfo();
-            }
+        btnSaveInfo.setOnClickListener(view -> saveInfo());
+
+        btnAddItem.setOnClickListener(v -> showDialogItem());
+
+        btnSeeListItem.setOnClickListener(v -> {
+
         });
         imgButtonCalendar.setOnClickListener(v -> displayCalendar());
+        btnSaveItem.setOnClickListener(view -> onClickSaveItem());
 
+    }
+
+    private void showDialogItem(){
+
+
+        edtItemName.setText("");
+        edtItemCost.setText("");
+
+        initListenerDialogItem();
+
+        dialogItem.show();
+    }
+
+    private void initListenerDialogItem(){
+
+
+    }
+
+    private void onClickSaveItem(){
+        String itemName = edtItemName.getText().toString().trim();
+        float itemCost = Float.parseFloat(edtItemCost.getText().toString().trim());
+        Item item = new Item(itemName, itemCost);
+        itemList.add(item);
+        showDialogItem();
+    }
+
+    private void onClickFinishItem(){
+        Log.e("Size List Item :", itemList.size()+"");
+        dialogItem.dismiss();
     }
 
 
@@ -520,27 +573,27 @@ public class InvoiceInformationFragment1 extends Fragment {
 //        RequestBody requestBody = RequestBody.create(MediaType.parse("multipart/form-data"),bitma)
         MultipartBody.Part multipartBodyImg = MultipartBody.Part.createFormData("image", file.getName(), requestBodyImg);
 
-        ApiService.apiService.getInformationInvoice2(multipartBodyImg).enqueue(new Callback<Invoice>() {
-            @Override
-            public void onResponse(Call<Invoice> call, Response<Invoice> response) {
-
-                Invoice invoice = response.body();
-                if(invoice != null){
-                    mProgressDialog.dismiss();
-                    edtSeller.setText(invoice.getSeller());
-                    edtAddress.setText(invoice.getAddress());
-                    edtTimestamp.setText(invoice.getTimestamp());
-                    edtTotalCost.setText(invoice.getTotalCost()+"");
-                }
-            }
-
-            @Override
-            public void onFailure(Call<Invoice> call, Throwable t) {
-                mProgressDialog.dismiss();
-                t.printStackTrace();
-                Toast.makeText(getActivity(), "Call Api False", Toast.LENGTH_SHORT).show();
-            }
-        });
+//        ApiService.apiService.getInformationInvoice2(multipartBodyImg).enqueue(new Callback<Invoice>() {
+//            @Override
+//            public void onResponse(Call<Invoice> call, Response<Invoice> response) {
+//
+//                Invoice invoice = response.body();
+//                if(invoice != null){
+//                    mProgressDialog.dismiss();
+//                    edtSeller.setText(invoice.getSeller());
+//                    edtAddress.setText(invoice.getAddress());
+//                    edtTimestamp.setText(invoice.getTimestamp());
+//                    edtTotalCost.setText(invoice.getTotalCost()+"");
+//                }
+//            }
+//
+//            @Override
+//            public void onFailure(Call<Invoice> call, Throwable t) {
+//                mProgressDialog.dismiss();
+//                t.printStackTrace();
+//                Toast.makeText(getActivity(), "Call Api False", Toast.LENGTH_SHORT).show();
+//            }
+//        });
     }
 
     public static File bitmapToFile(Context context, Bitmap bitmap, String fileNameToSave) { // File name like "image.png"
@@ -568,22 +621,26 @@ public class InvoiceInformationFragment1 extends Fragment {
     }
 
     private void saveInfo() {
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        if(user == null){
-            return;
-        }
+//        if(user == null){
+//            return;
+//        }
+//
+//        InvoiceModel invoice = new InvoiceModel();
+//        invoice.setSeller(edtSeller.getText().toString());
+//        invoice.setAddress(edtAddress.getText().toString());
+//        invoice.setTimestamp(edtTimestamp.getText().toString());
+//        invoice.setTotalCost(Float.parseFloat(edtTotalCost.getText().toString()));
+//        saveInformationInvoiceOnFirebase(invoice);FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
-        InvoiceModel invoice = new InvoiceModel();
-        invoice.setSeller(edtSeller.getText().toString());
-        invoice.setAddress(edtAddress.getText().toString());
-        invoice.setTimestamp(edtTimestamp.getText().toString());
-        invoice.setTotalCost(Float.parseFloat(edtTotalCost.getText().toString()));
-        saveInformationInvoiceOnFirebase(invoice);
 
         /* save into firebase
         https://console.firebase.google.com/u/6/project/smart-shouhi/database/smart-shouhi-default-rtdb/data
         https://firebase.google.com/docs/database/admin/save-data
         */
+
+
+
+
 
     }
 

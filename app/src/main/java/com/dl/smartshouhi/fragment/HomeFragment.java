@@ -1,5 +1,7 @@
 package com.dl.smartshouhi.fragment;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
@@ -14,11 +16,16 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
-import com.bumptech.glide.Glide;
+import com.android.volley.RequestQueue;
 import com.dl.smartshouhi.R;
-import com.dl.smartshouhi.activities.HomeActivity;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
+import com.dl.smartshouhi.activity.HomeActivity;
+
+import static com.dl.smartshouhi.constaint.Constant.DOB_KEY;
+import static com.dl.smartshouhi.constaint.Constant.EMAIL_KEY;
+import static com.dl.smartshouhi.constaint.Constant.FULLNAME_KEY;
+import static com.dl.smartshouhi.constaint.Constant.PHONE_KEY;
+import static com.dl.smartshouhi.constaint.Constant.SHARED_PREFS;
+import static com.dl.smartshouhi.constaint.Constant.USERNAME_KEY;
 
 public class HomeFragment extends Fragment {
 
@@ -30,6 +37,11 @@ public class HomeFragment extends Fragment {
     private ImageView imgChart;
     private ImageView imgHistory;
     private ImageView imgFavorite;
+
+    private SharedPreferences sharedpreferences;
+    private RequestQueue requestQueue;
+    private String emailShared, userNameShared, fullNameShared;
+    private String email, fullName, userName, phone, dob;
 
     private final InvoiceInformationFragment invoiceInformationFragment;
     private HomeActivity homeActivity;
@@ -62,16 +74,30 @@ public class HomeFragment extends Fragment {
         imgChart = mView.findViewById(R.id.img_chart);
         imgHistory = mView.findViewById(R.id.img_history);
         imgFavorite = mView.findViewById(R.id.img_favorite);
+
+
     }
 
     private void setUserInformation(){
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        if(user == null){
-            return;
-        }
+//        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+//        if(user == null){
+//            return;
+//        }
+//
+//        tvUsername.setText(user.getDisplayName());
+//        Glide.with(homeActivity).load(user.getPhotoUrl()).error(R.drawable.ic_avatar_default).into(imgAvatar);
 
-        tvUsername.setText(user.getDisplayName());
-        Glide.with(homeActivity).load(user.getPhotoUrl()).error(R.drawable.ic_avatar_default).into(imgAvatar);
+        sharedpreferences = this.getActivity().getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
+
+        // getting data from shared prefs and
+        // storing it in our string variable.
+        email = sharedpreferences.getString(EMAIL_KEY, "");
+        fullName = sharedpreferences.getString(FULLNAME_KEY, "");
+        userName = sharedpreferences.getString(USERNAME_KEY, "");
+        phone = sharedpreferences.getString(PHONE_KEY, "");
+        dob = sharedpreferences.getString(DOB_KEY, "");
+
+        tvUsername.setText(userName.trim());
     }
 
     private void initListener() {
@@ -87,8 +113,8 @@ public class HomeFragment extends Fragment {
 
     private void onClickAddInvoice() {
 
-//        replaceFragment(invoiceInformationFragment,"InvoiceInformationFragment");
-        replaceFragment(new InvoiceInformationFragment1(), "InvoiceInformationFragment");
+       replaceFragment(invoiceInformationFragment,"InvoiceInformationFragment");
+        // replaceFragment(new InvoiceInformationFragment1(), "InvoiceInformationFragment");
     }
 
     private void onClickShowChart() {

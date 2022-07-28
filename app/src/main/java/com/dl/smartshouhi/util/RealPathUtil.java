@@ -1,4 +1,4 @@
-package com.dl.smartshouhi.utils;
+package com.dl.smartshouhi.util;
 
 import android.annotation.SuppressLint;
 import android.content.ContentUris;

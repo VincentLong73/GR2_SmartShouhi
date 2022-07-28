@@ -26,7 +26,7 @@
         android:layout_marginEnd="64dp"
         android:background="@drawable/background_btn"
         android:text="Setup"
-        android:textColor="#ffffff"
+        android:textColor="#072BF4"
         android:textSize="18sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"

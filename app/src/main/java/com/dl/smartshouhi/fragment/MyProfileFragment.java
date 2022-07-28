@@ -2,17 +2,18 @@ package com.dl.smartshouhi.fragment;
 
 import android.Manifest;
 import android.app.ProgressDialog;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -21,12 +22,16 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.bumptech.glide.Glide;
+import com.android.volley.RequestQueue;
 import com.dl.smartshouhi.R;
-import com.dl.smartshouhi.activities.HomeActivity;
+import com.dl.smartshouhi.activity.HomeActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
+
+import static com.dl.smartshouhi.constaint.Constant.EMAIL_KEY;
+import static com.dl.smartshouhi.constaint.Constant.FULLNAME_KEY;
+import static com.dl.smartshouhi.constaint.Constant.USERNAME_KEY;
 
 public class MyProfileFragment extends Fragment {
 
@@ -38,11 +43,15 @@ public class MyProfileFragment extends Fragment {
     private EditText edtFullName;
     private TextView tvEmail;
     private Button btnUpdateProfile;
+    private ImageButton imgButtonCalendar;
     private Uri mUri;
 //    private MainActivity mainActivity;
     private HomeActivity homeActivity;
 
     private ProgressDialog progressDialog;
+    private SharedPreferences sharedpreferences;
+    private RequestQueue requestQueue;
+    private String emailShared, userNameShared, fullNameShared;
 
     @Nullable
     @Override
@@ -64,20 +73,27 @@ public class MyProfileFragment extends Fragment {
         imgAvatar = mView.findViewById(R.id.img_avatar_fragment_profile);
         edtFullName = mView.findViewById(R.id.edt_fullname);
         tvEmail = mView.findViewById(R.id.tv_email);
+        imgButtonCalendar = mView.findViewById(R.id.btn_calendar_profile);
         btnUpdateProfile = mView.findViewById(R.id.btn_update_profile);
+
+        emailShared = sharedpreferences.getString(EMAIL_KEY, "abc@gmail.com");
+        userNameShared = sharedpreferences.getString(USERNAME_KEY, "Van A");
+        fullNameShared = sharedpreferences.getString(FULLNAME_KEY, "Nguyen Van A");
     }
 
     private void setUserInformation(){
+
+
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if(user == null){
             return;
         }
-        Toast.makeText(getActivity(),"Hi "+user.getDisplayName(),Toast.LENGTH_LONG).show();
+        Toast.makeText(getActivity(),"Hi "+userNameShared,Toast.LENGTH_LONG).show();
 
-        edtFullName.setText(user.getDisplayName());
-        tvEmail.setText(user.getEmail());
-        Log.e(TAG_IMAGE, user.getPhotoUrl()+"");
-        Glide.with(getActivity()).load(user.getPhotoUrl()).error(R.drawable.ic_avatar_default).into(imgAvatar);
+        edtFullName.setText(fullNameShared);
+        tvEmail.setText(emailShared);
+//        Log.e(TAG_IMAGE, user.getPhotoUrl()+"");
+//        Glide.with(getActivity()).load(user.getPhotoUrl()).error(R.drawable.ic_avatar_default).into(imgAvatar);
     }
 
 

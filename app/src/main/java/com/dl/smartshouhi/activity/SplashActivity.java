@@ -1,4 +1,4 @@
-package com.dl.smartshouhi.activities;
+package com.dl.smartshouhi.activity;
 
 import android.content.Context;
 import android.content.Intent;
@@ -9,18 +9,16 @@ import android.os.Handler;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 
-import com.dl.smartshouhi.R;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-
-import static com.dl.smartshouhi.constaint.Constaint.EMAIL_KEY;
-import static com.dl.smartshouhi.constaint.Constaint.SHARED_PREFS;
+import static com.dl.smartshouhi.constaint.Constant.EMAIL_KEY;
+import static com.dl.smartshouhi.constaint.Constant.ISADMIN_KEY;
+import static com.dl.smartshouhi.constaint.Constant.SHARED_PREFS;
 
 public class SplashActivity extends AppCompatActivity {
 
     // variable for shared preferences.
-    SharedPreferences sharedpreferences;
-    String email;
+    private SharedPreferences sharedpreferences;
+    private String email;
+    private boolean isAdmin;
 
 
     @Override
@@ -34,12 +32,13 @@ public class SplashActivity extends AppCompatActivity {
     }
 
     private void nextActivity() {
-        //FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         sharedpreferences = getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
 
         // getting data from shared prefs and
         // storing it in our string variable.
         email = sharedpreferences.getString(EMAIL_KEY, null);
+        isAdmin = sharedpreferences.getBoolean(ISADMIN_KEY, false);
+
 
         Intent intent;
         //if(user == null){
@@ -50,6 +49,5 @@ public class SplashActivity extends AppCompatActivity {
         }
         startActivity(intent);
         finish();
-        //finishAffinity();
     }
 }

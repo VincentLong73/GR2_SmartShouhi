@@ -13,16 +13,23 @@
         android:label=""
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.SmartShouhi">
-        <activity android:name=".activities.HomeActivity" />
-        <activity android:name=".activities.SignInActivity" />
-        <activity android:name=".activities.SignUpActivity" />
-        <activity android:name=".activities.TestSelectMultiImage" />
+        android:theme="@style/Theme.SmartShouhi"
+        android:usesCleartextTraffic="true">
+        <activity android:name=".activity.HomeAdminActivity"></activity>
+        <!-- android:networkSecurityConfig="@xml/network_security_config"> -->
+        <!-- <meta-data -->
+        <!-- android:name="com.google.android.actions" -->
+        <!-- android:resource="@xml/network_security_config" /> -->
+        <activity android:name=".activity.HomeActivity" />
+        <activity android:name=".activity.SignInActivity" />
+        <activity android:name=".activity.SignUpActivity" />
+        <activity android:name=".activity.TestSelectMultiImage" />
         <activity
-            android:name=".activities.SplashActivity"
+            android:name=".activity.SplashActivity"
             android:theme="@style/SplashScreenTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

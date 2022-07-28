@@ -37,10 +37,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.dl.smartshouhi.constaint.Constaint.ID_KEY;
-import static com.dl.smartshouhi.constaint.Constaint.SHARED_PREFS;
-import static com.dl.smartshouhi.constaint.Constaint.URL_GET_INVOICE_BY_USER_ID;
-import static com.dl.smartshouhi.constaint.Constaint.URL_GET_INVOICE_BY_USER_ID_YEAR;
+import static com.dl.smartshouhi.constaint.Constant.ID_KEY;
+import static com.dl.smartshouhi.constaint.Constant.SHARED_PREFS;
+import static com.dl.smartshouhi.constaint.Constant.URL_GET_INVOICE_BY_USER_ID;
+import static com.dl.smartshouhi.constaint.Constant.URL_GET_INVOICE_BY_USER_ID_YEAR;
 
 public class ChartFragment extends Fragment {
     private static final int MAX_X_VALUE = 7;
@@ -56,18 +56,16 @@ public class ChartFragment extends Fragment {
     private ArrayAdapter<String> spinnerAdapter;
 
     private View mView;
-//    private SwitchMaterial btnSwitch;
     private Switch btnSwitch;
     private Spinner spinnerYear;
 
-    private long totalUser;
-    private int indexUserCurrent;
-//    private int totalInvoice;
     private int yearSelected ;
     private List<String> listYear;
 
     private SharedPreferences sharedpreferences;
     private int userId;
+    private boolean isFlag = false; // false - Year, true - Week
+    private boolean isFirst = true;
 
 
 
@@ -82,42 +80,57 @@ public class ChartFragment extends Fragment {
 
         initUI();
 
-//        getTotalUserOnFb();
-
-        if(btnSwitch.isChecked()){
-            processingDataYear();
-            //replaceFragmentChart(totalCostOfListInvoiceYear,MONTHS,MAX_X_VALUE_MONTH);
-        }else{
-            processingDataWeek();
-            //replaceFragmentChart(totalCostOfListInvoiceWeek,DAYS,MAX_X_VALUE);
-        }
-
         btnSwitch.setOnCheckedChangeListener((compoundButton, b) -> {
-//            processingDataYear();
-//            replaceFragmentChart(totalCostOfListInvoiceYear,MONTHS,MAX_X_VALUE_MONTH);
 
-//            getTotalUserOnFb();
-            if(btnSwitch.isChecked()){
-                processingDataYear();
-                //replaceFragmentChart(totalCostOfListInvoiceYear,MONTHS,MAX_X_VALUE_MONTH);
+
+
+//            if(btnSwitch.isChecked()){
+////                processingDataYear();
+//                if(isFlag){
+//                    processingDataYear();
+//                    isFlag = false;
+//                }else {
+//                    processingDataWeek();
+//                    isFlag = true;
+//                }
+//            }else{
+//                processingDataWeek();
+//            }
+            if(isFirst){
+                isFirst = false;
             }else{
-                processingDataWeek();
-                //replaceFragmentChart(totalCostOfListInvoiceWeek,DAYS,MAX_X_VALUE);
+                if(isFlag){
+                    processingDataYear();
+                    isFlag = false;
+                }else {
+                    processingDataWeek();
+                    isFlag = true;
+                }
             }
+
         });
 
         spinnerYear.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 yearSelected = Integer.parseInt(spinnerAdapter.getItem(position));
-//                getTotalUserOnFb();
-                if(btnSwitch.isChecked()){
-                    processingDataYear();
-                    //replaceFragmentChart(totalCostOfListInvoiceYear,MONTHS,MAX_X_VALUE_MONTH);
+
+                if(isFirst){
+                    isFirst = false;
                 }else{
-                    processingDataWeek();
-                    //replaceFragmentChart(totalCostOfListInvoiceWeek,DAYS,MAX_X_VALUE);
+                    if(isFlag){
+                        processingDataWeek();
+                    }else{
+                        processingDataYear();
+                    }
                 }
+
+
+//                if(btnSwitch.isChecked()){
+//                    processingDataYear();
+//                }else{
+//                    processingDataWeek();
+//                }
 
             }
 
@@ -148,6 +161,8 @@ public class ChartFragment extends Fragment {
         spinnerYear.setAdapter(spinnerAdapter);
         yearSelected = Integer.parseInt(spinnerAdapter.getItem(0));
 
+        processingDataYear();
+
     }
 
     private void initTotalCostOfListInvoiceWeek(){
@@ -171,82 +186,6 @@ public class ChartFragment extends Fragment {
         }
     }
 
-
-//    private void getTotalUserOnFb(){
-//        FirebaseDatabase database = FirebaseDatabase.getInstance("https://smart-shouhi-default-rtdb.asia-southeast1.firebasedatabase.app/");
-//        DatabaseReference myRef = database.getReference();
-//        myRef.child("totalUser").get().addOnCompleteListener(task -> {
-//            if(task.isSuccessful()){
-//                setTotalUser((Long) Long.parseLong(String.valueOf(task.getResult().getValue())));
-//                getIdUserCurrent();
-//            }
-//        });
-//    }
-//
-//    private void getIdUserCurrent(){
-//        FirebaseAuth mAuth = FirebaseAuth.getInstance();
-//        User user = new User(mAuth.getCurrentUser().getEmail());
-//
-//        FirebaseDatabase database = FirebaseDatabase.getInstance("https://smart-shouhi-default-rtdb.asia-southeast1.firebasedatabase.app/");
-//        DatabaseReference myRef = database.getReference();
-//
-//        for(int i = 0 ; i<getTotalUser() ; i++){
-//            int finalI = i;
-//            myRef.child(i+"").child("email").get().addOnCompleteListener(task -> {
-//
-//                if(task.isSuccessful()){
-//                    String email = String.valueOf(task.getResult().getValue());
-//                    if(email.equals(user.getEmail())){
-//                        setIndexUserCurrent(finalI);
-//                        getListInvoiceDatabase();
-//                    }
-//
-//                }
-//            });
-//        }
-//    }
-//
-//    private void getListInvoiceDatabase(){
-//
-//
-//        FirebaseDatabase database = FirebaseDatabase.getInstance("https://smart-shouhi-default-rtdb.asia-southeast1.firebasedatabase.app/");
-//        DatabaseReference myRef = database.getReference(getIndexUserCurrent()+"/invoices");
-//
-//        myRef.addListenerForSingleValueEvent(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot snapshot) {
-//                invoiceList.clear();
-//                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-//                    try {
-//                        Invoice invoice = dataSnapshot.getValue(Invoice.class);
-//                        if (invoice != null) {
-//                            invoiceList.add(invoice);
-//                        }
-//                    } catch (DatabaseException e) {
-//                        if(dataSnapshot.getKey().equals("totalInvoice")){
-//                            totalInvoice = dataSnapshot.getValue(Integer.class);
-//                        }
-//                    }
-//                }
-//
-////                processingDataWeek();
-////                processingDataYear();
-//                if(btnSwitch.isChecked()){
-//                    processingDataYear();
-//                    replaceFragmentChart(totalCostOfListInvoiceYear,MONTHS,MAX_X_VALUE_MONTH);
-//                }else{
-//                    processingDataWeek();
-//                    replaceFragmentChart(totalCostOfListInvoiceWeek,DAYS,MAX_X_VALUE);
-//                }
-//
-////                replaceFragmentChart(totalCostOfListInvoiceWeek,DAYS,MAX_X_VALUE);
-//            }
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError error) {
-//            }
-//        });
-//    }
-
     private void processingDataWeek() {
         RequestQueue requestQueue;
         requestQueue = Volley.newRequestQueue(getActivity());
@@ -261,11 +200,16 @@ public class ChartFragment extends Fragment {
             @Override
             public void onResponse(String response) {
 
+                response = response.replace("\\", "");
+                response = response.replace("\"{", "{");
+                response = response.replace("}\"", "}");
+                response = response.substring(1, response.length() - 1);
                 Gson gson = new Gson();
-                invoiceList = Arrays.asList(gson.fromJson(response, Invoice[].class));
 
-                if(invoiceList.size() > 0){
+                String[] listResult = response.split("#");;
 
+                if(listResult[0].equals("200")){
+                    invoiceList = Arrays.asList(gson.fromJson(listResult[1], Invoice[].class));
                     for(Invoice invoice : invoiceList) {
                         Calendar calendar = Calendar.getInstance();
 //                        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
@@ -294,7 +238,7 @@ public class ChartFragment extends Fragment {
 
                 }else {
                     // If sign in fails, display a message to the user.
-                    Toast.makeText(getActivity(), "Authentication failed.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), listResult[1], Toast.LENGTH_SHORT).show();
                 }
 
             }
@@ -310,30 +254,6 @@ public class ChartFragment extends Fragment {
         };
 
         requestQueue.add(stringRequest);
-
-        //Khoi tao mang list invoice
-//        initTotalCostOfListInvoiceWeek();
-//
-//        for(Invoice invoice : invoiceList){
-//
-//            Calendar calendar = Calendar.getInstance();
-//            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-//            try {
-//                calendar.setTime(dateFormat.parse(invoice.getTimestamp()));
-//                if(calendar.get(Calendar.YEAR) == yearSelected) {
-//                    int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
-//                    int weekOfYear = calendar.get(Calendar.WEEK_OF_YEAR);
-//                    if (weekOfYear == 1) {
-//                        weekOfYear = 52;
-//                    } else {
-//                        weekOfYear -= 1;
-//                    }
-//                    totalCostOfListInvoiceWeek[weekOfYear - 1][dayOfWeek - 1] += invoice.getTotalCost();
-//                }
-//            } catch (ParseException e) {
-//                e.printStackTrace();
-//            }
-//        }
 
     }
     private void processingDataYear() {
@@ -353,10 +273,17 @@ public class ChartFragment extends Fragment {
             @Override
             public void onResponse(String response) {
 
+                response = response.replace("\\", "");
+                response = response.replace("\"{", "{");
+                response = response.replace("}\"", "}");
+                response = response.substring(1, response.length() - 1);
                 Gson gson = new Gson();
-                invoiceList = Arrays.asList(gson.fromJson(response, Invoice[].class));
 
-                if(invoiceList.size() > 0){
+                String[] listResult = response.split("#");
+
+                if(listResult[0].equals("200")){
+                    invoiceList = Arrays.asList(gson.fromJson(listResult[1], Invoice[].class));
+
                     for(Invoice invoice : invoiceList) {
                         Calendar calendar = Calendar.getInstance();
 //                        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
@@ -397,21 +324,6 @@ public class ChartFragment extends Fragment {
         };
         requestQueue.add(stringRequest);
 
-//        for(Invoice invoice : invoiceList){
-//
-//            Calendar calendar = Calendar.getInstance();
-//            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-//            try {
-//                calendar.setTime(dateFormat.parse(invoice.getTimestamp()));
-//
-//                int month = calendar.get(Calendar.MONTH);
-//                int year = calendar.get(Calendar.YEAR);
-//                totalCostOfListInvoiceYear[year - 2020][month] += invoice.getTotalCost();
-//
-//            } catch (ParseException e) {
-//                e.printStackTrace();
-//            }
-//        }
     }
 
     private void replaceFragmentChart(Float[][] totalCostOfListInVoice,String[] xLabels,  int maxXAxis){
@@ -424,19 +336,5 @@ public class ChartFragment extends Fragment {
         transaction.commit();
     }
 
-    public long getTotalUser() {
-        return totalUser;
-    }
 
-    public void setTotalUser(long totalUser) {
-        this.totalUser = totalUser;
-    }
-
-    public int getIndexUserCurrent() {
-        return indexUserCurrent;
-    }
-
-    public void setIndexUserCurrent(int indexUserCurrent) {
-        this.indexUserCurrent = indexUserCurrent;
-    }
 }

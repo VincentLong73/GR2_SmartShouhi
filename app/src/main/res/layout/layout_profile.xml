@@ -34,7 +34,7 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
-                android:id="@+id/tv_fullName_profile"
+                android:id="@+id/tv_username_profile_show"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
@@ -173,13 +173,13 @@
                         android:textSize="18sp" />
 
                     <TextView
-                        android:id="@+id/tv_email_profile"
+                        android:id="@+id/tv_email_profile_show"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="30dp"
-                        android:text="dlong@gmail.com"
+                        android:hint="Email"
                         android:textAlignment="viewStart"
-                        android:textColor="#505050"
+                        android:textColor="#F44336"
                         android:textSize="16sp" />
                 </LinearLayout>
 
@@ -205,16 +205,53 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Mobile"
+                        android:text="Full name"
                         android:textColor="#0090ff"
                         android:textSize="18sp" />
 
                     <TextView
+                        android:id="@+id/tv_fullName_profile_show"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="17dp"
-                        android:text="0384276226"
-                        android:textColor="#505050"
+                        android:hint="Nguyen Van A"
+                        android:textColor="#F44336"
+                        android:textSize="16sp" />
+                </LinearLayout>
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_margin="10dp"
+                    android:alpha="0.5"
+                    android:background="#505050" />
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginBottom="5dp"
+                    android:elevation="5dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Dob"
+                        android:textColor="#0090ff"
+                        android:textSize="18sp" />
+
+                    <TextView
+                        android:id="@+id/tv_dob_profile_show"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="17dp"
+                        android:hint="2000-10-20"
+                        android:textColor="#F44336"
                         android:textSize="16sp" />
                 </LinearLayout>
 
@@ -227,6 +264,34 @@
                     android:layout_margin="10dp"
                     android:alpha="0.5"
                     android:background="#505050" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginBottom="5dp"
+                    android:elevation="5dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Mobile"
+                        android:textColor="#0090ff"
+                        android:textSize="18sp" />
+
+                    <TextView
+                        android:id="@+id/tv_phone_profile_show"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="17dp"
+                        android:hint="0123456789"
+                        android:textColor="#F44336"
+                        android:textSize="16sp" />
+                </LinearLayout>
 
 
                 <LinearLayout

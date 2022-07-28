@@ -1,4 +1,4 @@
-package com.dl.smartshouhi.activities;
+package com.dl.smartshouhi.activity;
 
 import android.Manifest;
 import android.net.Uri;

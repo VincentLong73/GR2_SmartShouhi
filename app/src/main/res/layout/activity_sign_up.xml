@@ -55,12 +55,58 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView" />
 
+
+    <EditText
+        android:id="@+id/edt_username_signup"
+        android:layout_width="0dp"
+        android:layout_height="45dp"
+        android:layout_marginStart="64dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="64dp"
+        android:background="@drawable/edittext_background"
+        android:ems="10"
+        android:hint="User Name"
+        android:inputType="textPersonName"
+        android:textAlignment="center"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/edt_email" />
+
+    <EditText
+        android:id="@+id/edt_dob_signup"
+        android:layout_width="0dp"
+        android:layout_height="45dp"
+        android:layout_marginStart="64dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="64dp"
+        android:background="@drawable/edittext_background"
+        android:ems="10"
+        android:hint="Date of Birth"
+        android:inputType="textPersonName"
+        android:textAlignment="center"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/edt_username_signup" />
+
+    <ImageButton
+        android:id="@+id/btn_calendar_signup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="80dp"
+        android:background="@drawable/ic_calendar"
+        app:layout_constraintBottom_toBottomOf="@+id/edt_dob_signup"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/edt_dob_signup" />
+
     <EditText
         android:id="@+id/edt_password"
         android:layout_width="0dp"
         android:layout_height="45dp"
         android:layout_marginStart="64dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="8dp"
         android:layout_marginEnd="64dp"
         android:background="@drawable/edittext_background"
         android:ems="10"
@@ -72,18 +118,18 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/edt_email" />
+        app:layout_constraintTop_toBottomOf="@+id/edt_dob_signup" />
 
     <Button
         android:id="@+id/btn_sign_up"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="64dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="64dp"
+        android:layout_marginStart="128dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="128dp"
         android:background="@drawable/background_btn"
         android:text="Sign Up"
-        android:textColor="#ffffff"
+        android:textColor="#072BF4"
         android:textSize="18sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"

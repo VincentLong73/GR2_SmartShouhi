@@ -33,36 +33,19 @@ import com.dl.smartshouhi.adapter.InvoiceAdapter;
 import com.dl.smartshouhi.model.Invoice;
 import com.dl.smartshouhi.model.InvoiceModel;
 import com.dl.smartshouhi.model.User;
-import com.github.mikephil.charting.charts.BarChart;
-import com.github.mikephil.charting.components.XAxis;
-import com.github.mikephil.charting.components.YAxis;
-import com.github.mikephil.charting.data.BarData;
-import com.github.mikephil.charting.data.BarDataSet;
-import com.github.mikephil.charting.data.BarEntry;
-import com.github.mikephil.charting.formatter.ValueFormatter;
-import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.ChildEventListener;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseException;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.dl.smartshouhi.constaint.Constaint.ID_KEY;
-import static com.dl.smartshouhi.constaint.Constaint.SHARED_PREFS;
-import static com.dl.smartshouhi.constaint.Constaint.URL_GET_INVOICE_BY_USER_ID;
+import static com.dl.smartshouhi.constaint.Constant.ID_KEY;
+import static com.dl.smartshouhi.constaint.Constant.SHARED_PREFS;
+import static com.dl.smartshouhi.constaint.Constant.URL_GET_INVOICE_BY_USER_ID;
 
 public class HistoryFragment extends Fragment {
 
@@ -78,7 +61,7 @@ public class HistoryFragment extends Fragment {
 
 
     private int totalInvoice;
-    private List<Invoice> invoiceList;
+    private List<InvoiceModel> invoiceList;
 
     @Nullable
     @Override
@@ -96,7 +79,7 @@ public class HistoryFragment extends Fragment {
 
     private void initUI() {
 
-        invoiceList = new ArrayList<>();
+//        invoiceList = new ArrayList<>();
         rcvInvoices = mView.findViewById(R.id.rcv_invoices);
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
@@ -113,7 +96,7 @@ public class HistoryFragment extends Fragment {
         rcvInvoices.setAdapter(invoiceAdapter);
     }
 
-    private void openDialogUpdateItem(Invoice invoice, int position){
+    private void openDialogUpdateItem(InvoiceModel invoice, int position){
         dialogUpdate = new Dialog(getActivity());
         dialogUpdate.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialogUpdate.setContentView(R.layout.layout_dialog_update_item_invoice);
@@ -143,106 +126,18 @@ public class HistoryFragment extends Fragment {
         dialogUpdate.show();
     }
 
-    private void getTotalUserOnFb(){
-        FirebaseDatabase database = FirebaseDatabase.getInstance("https://smart-shouhi-default-rtdb.asia-southeast1.firebasedatabase.app/");
-        DatabaseReference myRef = database.getReference();
-        myRef.child("totalUser").get().addOnCompleteListener(task -> {
-            if(task.isSuccessful()){
-                setTotalUser( Long.parseLong(String.valueOf(task.getResult().getValue())));
-                getIdUserCurrent();
-            }
-        });
-    }
-
-    private void getIdUserCurrent(){
-        FirebaseAuth mAuth = FirebaseAuth.getInstance();
-        User user = new User(mAuth.getCurrentUser().getEmail());
-
-        FirebaseDatabase database = FirebaseDatabase.getInstance("https://smart-shouhi-default-rtdb.asia-southeast1.firebasedatabase.app/");
-        DatabaseReference myRef = database.getReference();
-
-        for(int i = 0 ; i<getTotalUser() ; i++){
-            int finalI = i;
-            myRef.child(i+"").child("email").get().addOnCompleteListener(task -> {
-
-                if(task.isSuccessful()){
-                    String email = String.valueOf(task.getResult().getValue());
-                    if(email.equals(user.getEmail())){
-                        setIndexUserCurrent(finalI);
-                        getListInvoiceDatabase();
-                    }
-
-                }
-            });
-        }
-    }
-
-    private void getListInvoiceDatabase(){
-
-
-        FirebaseDatabase database = FirebaseDatabase.getInstance("https://smart-shouhi-default-rtdb.asia-southeast1.firebasedatabase.app/");
-        DatabaseReference myRef = database.getReference(getIndexUserCurrent()+"/invoices");
-
-        myRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                invoiceList.clear();
-                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                    try {
-                        Invoice invoice = dataSnapshot.getValue(Invoice.class);
-                        if (invoice != null) {
-                            invoiceList.add(invoice);
-                        }
-                    } catch (DatabaseException e) {
-                        if(dataSnapshot.getKey().equals("totalInvoice")){
-                            totalInvoice = dataSnapshot.getValue(Integer.class);
-                        }
-                    }
-                }
-                initRecycleView();
-
-            }
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-            }
-        });
-    }
-
-    private void updateItem(Invoice invoice, int postion){
+    private void updateItem(InvoiceModel invoice, int postion){
 
         FirebaseDatabase database = FirebaseDatabase.getInstance("https://smart-shouhi-default-rtdb.asia-southeast1.firebasedatabase.app/");
         DatabaseReference myRef = database.getReference();
         myRef.child("totalUser").get().addOnCompleteListener(task -> {
             if(task.isSuccessful()){
                 setTotalUser(Long.parseLong(String.valueOf(task.getResult().getValue())));
-                getIdUserCurrentToUpdate(invoice, postion);
+//                getIdUserCurrentToUpdate(invoice, postion);
             }
         });
     }
-    private void getIdUserCurrentToUpdate(Invoice invoice, int postion){
-        FirebaseAuth mAuth = FirebaseAuth.getInstance();
-        User user = new User(mAuth.getCurrentUser().getEmail());
 
-        FirebaseDatabase database = FirebaseDatabase.getInstance("https://smart-shouhi-default-rtdb.asia-southeast1.firebasedatabase.app/");
-        DatabaseReference myRef = database.getReference();
-
-        for(int i = 0 ; i<getTotalUser() ; i++){
-            int finalI = i;
-            myRef.child(i+"").child("email").get().addOnCompleteListener(task -> {
-
-                if(task.isSuccessful()){
-                    String email = String.valueOf(task.getResult().getValue());
-                    if(email.equals(user.getEmail())){
-                        setIndexUserCurrent(finalI);
-                        Log.e("Test total user ",getTotalUser()+"");
-                        Log.e("Test index user ",getIndexUserCurrent()+"");
-                        updateItemInList(invoice, postion);
-                    }
-
-                }
-            });
-        }
-    }
 
     private void updateItemInList(Invoice invoice, int postion){
 
@@ -263,7 +158,7 @@ public class HistoryFragment extends Fragment {
 
                 Toast.makeText(getActivity(), "Update Successed", Toast.LENGTH_LONG);
                 dialogUpdate.dismiss();
-                getTotalUserOnFb();
+//                getTotalUserOnFb();
             }
         });
     }
@@ -290,7 +185,7 @@ public class HistoryFragment extends Fragment {
         int userId;
         RequestQueue requestQueue;
         requestQueue = Volley.newRequestQueue(getActivity());
-        invoiceList.clear();
+//        invoiceList.clear();
 
         sharedpreferences = this.getActivity().getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
 
@@ -301,14 +196,26 @@ public class HistoryFragment extends Fragment {
             @Override
             public void onResponse(String response) {
 
-                Gson gson = new Gson();
-                invoiceList = Arrays.asList(gson.fromJson(response, Invoice[].class));
+                response = response.replace("\\", "");
+                response = response.replace("\"{", "{");
+                response = response.replace("}\"", "}");
+                response = response.substring(1, response.length() - 1);
 
-                initRecycleView();
+                Gson gson = new Gson();
+
+//                String result = gson.fromJson(response, String.class);
+                String[] listResult = response.split("#");
+                if(listResult[0].equals("200")) {
+                    invoiceList = Arrays.asList(gson.fromJson(listResult[1], InvoiceModel[].class));
+                    initRecycleView();
+                }else {
+                    Toast.makeText(getActivity(), listResult[1], Toast.LENGTH_LONG);
+                }
+
 
             }
         }, error -> {
-
+            Toast.makeText(getActivity(), "error", Toast.LENGTH_LONG);
         }){
             @Override
             protected Map<String, String> getParams() {

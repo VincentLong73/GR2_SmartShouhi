@@ -10,24 +10,25 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.dl.smartshouhi.R;
-import com.dl.smartshouhi.model.Invoice;
+import com.dl.smartshouhi.model.InvoiceModel;
 
 import java.util.List;
 
 
 public class InvoiceAdapter extends RecyclerView.Adapter<InvoiceAdapter.InvoiceViewHolder> {
 
-    private List<Invoice> invoiceList;
+    private List<InvoiceModel> invoiceList;
     private IClickListener iClickListener;
 
     public interface IClickListener{
-        void onClickUpdateItem(Invoice invoice, int position);
+        void onClickUpdateItem(InvoiceModel invoice, int position);
     }
 
-    public InvoiceAdapter(List<Invoice> invoiceList, IClickListener iClickListener) {
+    public InvoiceAdapter(List<InvoiceModel> invoiceList, IClickListener iClickListener) {
         this.invoiceList = invoiceList;
         this.iClickListener = iClickListener;
     }
+
 
     @NonNull
     @Override
@@ -38,7 +39,8 @@ public class InvoiceAdapter extends RecyclerView.Adapter<InvoiceAdapter.InvoiceV
 
     @Override
     public void onBindViewHolder(@NonNull  InvoiceViewHolder holder, int position) {
-        Invoice invoice = invoiceList.get(position);
+//        InvoiceModel invoice = invoiceList.get(position);
+        InvoiceModel invoice = invoiceList.get(position);
         if(invoice == null){
             return;
         }
