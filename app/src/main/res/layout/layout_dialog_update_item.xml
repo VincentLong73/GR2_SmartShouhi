@@ -15,7 +15,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/purple_700"
-            android:text="Dialog Update Title"
+            android:text="Cập nhật thông tin sản phẩm"
             android:padding="10dp"
             android:gravity="center"
             android:textColor="@color/white"/>
@@ -25,13 +25,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
-            android:hint="Item Name"/>
+            android:hint="Tên sản phẩm"/>
         <EditText
             android:id="@+id/edt_update_address"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
-            android:hint="Item Cost"/>
+            android:hint="Giá"/>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -45,14 +45,14 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:layout_marginRight="10dp"
-                android:text="Cancel"/>
+                android:text="Hủy"/>
 
             <Button
                 android:id="@+id/btn_update_item"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Update"/>
+                android:text="Cập nhật"/>
 
 
         </LinearLayout>

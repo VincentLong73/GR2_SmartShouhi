@@ -17,15 +17,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
             android:background="@drawable/background_btn"
-            android:text="Select Image From Gallery" />
+            android:text="Chọn ảnh" />
 
-<!--        <ImageView-->
-<!--            android:id="@+id/img_from_gallery"-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:layout_margin="10dp"-->
-<!--            android:src="@mipmap/ic_launcher"-->
-<!--            />-->
 
         <com.github.chrisbanes.photoview.PhotoView
             android:id="@+id/img_from_gallery"
@@ -35,194 +28,26 @@
             android:layout_gravity="center"
             android:src="@mipmap/ic_launcher"
             />
-<!--        <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"-->
-<!--            android:id="@+id/container"-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="500dp">-->
-
-<!--            <LinearLayout android:layout_width="match_parent"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:orientation="vertical"-->
-<!--                android:padding="16dp">-->
-
-
-<!--                <ImageButton-->
-<!--                    android:id="@+id/img_button_zoom"-->
-<!--                    android:layout_width="30dp"-->
-<!--                    android:layout_height="30dp"-->
-<!--                    android:layout_gravity="center"-->
-<!--                    android:src="@drawable/ic_zoom_out"-->
-<!--                    android:scaleType="centerCrop"-->
-<!--                    />-->
-
-<!--            </LinearLayout>-->
-
-<!--            &lt;!&ndash; This initially-hidden ImageView will hold the expanded/zoomed version of-->
-<!--                 the images above. Without transformations applied, it takes up the entire-->
-<!--                 screen. To achieve the "zoom" animation, this view's bounds are animated-->
-<!--                 from the bounds of the thumbnail button above, to its final laid-out-->
-<!--                 bounds.-->
-<!--                 &ndash;&gt;-->
-
-<!--            <ImageView-->
-<!--                android:id="@+id/expanded_image"-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="match_parent"-->
-<!--                android:visibility="invisible"-->
-<!--                />-->
-
-<!--        </FrameLayout>-->
 
         <Button
             android:id="@+id/btn_get_in4"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/background_btn"
-            android:text="Get information" />
+            android:text="trích xuất thông tin" />
 
         <androidx.recyclerview.widget.RecyclerView
+            android:layout_margin="10sp"
             android:id="@+id/rcv_items"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             />
-
-<!--        <LinearLayout-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:paddingStart="10dp"-->
-<!--            android:layout_margin="5dp"-->
-<!--            android:background="@drawable/edittext_background"-->
-<!--            android:orientation="horizontal"-->
-<!--            android:padding="2sp">-->
-
-<!--            <TextView-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:text="Seller"-->
-<!--                android:textColor="@color/purple_700"-->
-<!--                android:textSize="16sp"-->
-<!--                android:textStyle="bold" />-->
-
-<!--            <EditText-->
-<!--                android:id="@+id/edt_seller"-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:layout_marginLeft="5dp"-->
-<!--                android:hint="seller"-->
-<!--                android:textColor="@android:color/black"-->
-<!--                android:textSize="16sp" />-->
-
-<!--        </LinearLayout>-->
-
-<!--        <LinearLayout-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:paddingStart="10dp"-->
-<!--            android:layout_margin="5dp"-->
-<!--            android:background="@drawable/edittext_background"-->
-<!--            android:orientation="horizontal"-->
-<!--            android:padding="2sp">-->
-
-<!--            <TextView-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:text="Address"-->
-<!--                android:textColor="@color/purple_700"-->
-<!--                android:textSize="16sp"-->
-<!--                android:textStyle="bold" />-->
-
-<!--            <EditText-->
-<!--                android:id="@+id/edt_address"-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:layout_marginLeft="5dp"-->
-<!--                android:hint="address"-->
-<!--                android:textColor="@android:color/black"-->
-<!--                android:textSize="16sp" />-->
-
-<!--        </LinearLayout>-->
-
-<!--        <LinearLayout-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:paddingStart="10dp"-->
-<!--            android:layout_margin="5dp"-->
-<!--            android:background="@drawable/edittext_background"-->
-<!--            android:orientation="horizontal"-->
-<!--            android:padding="2sp">-->
-
-<!--            <TextView-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:text="Timestamp"-->
-<!--                android:textColor="@color/purple_700"-->
-<!--                android:textSize="16sp"-->
-<!--                android:textStyle="bold" />-->
-
-<!--            <EditText-->
-<!--                android:id="@+id/edt_timestamp"-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:layout_marginLeft="5dp"-->
-<!--                android:hint="2022-01-01"-->
-<!--                android:textColor="@android:color/black"-->
-<!--                android:textSize="16sp" />-->
-
-<!--            <ImageButton-->
-<!--                android:id="@+id/btn_calendar"-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:layout_marginStart="10dp"-->
-<!--                android:layout_gravity="center"-->
-<!--                android:background="@drawable/ic_calendar" />-->
-
-<!--        </LinearLayout>-->
-
-<!--        <LinearLayout-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:paddingStart="10dp"-->
-<!--            android:layout_margin="5dp"-->
-<!--            android:background="@drawable/edittext_background"-->
-<!--            android:orientation="horizontal"-->
-<!--            android:padding="2sp">-->
-
-<!--            <TextView-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:text="Total cost"-->
-<!--                android:textColor="@color/purple_700"-->
-<!--                android:textSize="16sp"-->
-<!--                android:textStyle="bold" />-->
-
-<!--            <EditText-->
-<!--                android:id="@+id/edt_total_cost"-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:layout_marginLeft="5dp"-->
-<!--                android:hint="0.00"-->
-<!--                android:textColor="@android:color/black"-->
-<!--                android:textSize="16sp" />-->
-
-<!--        </LinearLayout>-->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:paddingStart="10dp"
-        android:layout_margin="5dp"
-        android:orientation="horizontal"
-        android:padding="2sp">
         <Button
-        android:id="@+id/btn_save_list_item"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:text="save"
-        android:background="@drawable/background_btn"
-        android:textColor="#505050"
-        android:textSize="16sp" />
-
-    </LinearLayout>
+            android:id="@+id/btn_save_list_item"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="lưu"
+            android:background="@drawable/background_btn" />
 
     </LinearLayout>
 </ScrollView>

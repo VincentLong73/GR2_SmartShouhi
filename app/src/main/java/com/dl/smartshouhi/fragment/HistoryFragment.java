@@ -6,18 +6,21 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.util.Log;
+import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -30,15 +33,12 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.dl.smartshouhi.R;
 import com.dl.smartshouhi.adapter.InvoiceAdapter;
-import com.dl.smartshouhi.model.Invoice;
 import com.dl.smartshouhi.model.InvoiceModel;
-import com.dl.smartshouhi.model.User;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.gson.Gson;
 
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,22 +46,20 @@ import java.util.Map;
 import static com.dl.smartshouhi.constaint.Constant.ID_KEY;
 import static com.dl.smartshouhi.constaint.Constant.SHARED_PREFS;
 import static com.dl.smartshouhi.constaint.Constant.URL_GET_INVOICE_BY_USER_ID;
+import static com.dl.smartshouhi.constaint.Constant.URL_UPDATE_A_INVOICE;
 
 public class HistoryFragment extends Fragment {
 
     private View mView;
     private RecyclerView rcvInvoices;
-    private InvoiceAdapter invoiceAdapter;
-    private long totalUser;
-    private int indexUserCurrent;
 
     private EditText edtUpdateSeller, edtUpdateAddress, edtUpdateTotalCost, edtUpdateTimestamp;
-    private Button btnCancelUpdate, btnUpdate;
+    private Button btnCancelUpdate;
     private Dialog dialogUpdate;
+    private ImageButton imgButtonCalendar;
 
-
-    private int totalInvoice;
     private List<InvoiceModel> invoiceList;
+    private RequestQueue requestQueue;
 
     @Nullable
     @Override
@@ -71,7 +69,6 @@ public class HistoryFragment extends Fragment {
 
         initUI();
         processingData();
-        //getTotalUserOnFb();
 
         return mView;
     }
@@ -79,7 +76,6 @@ public class HistoryFragment extends Fragment {
 
     private void initUI() {
 
-//        invoiceList = new ArrayList<>();
         rcvInvoices = mView.findViewById(R.id.rcv_invoices);
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
@@ -89,10 +85,12 @@ public class HistoryFragment extends Fragment {
                 DividerItemDecoration.VERTICAL);
         rcvInvoices.addItemDecoration(dividerItemDecoration);
 
+        requestQueue = Volley.newRequestQueue(getActivity());
+
     }
 
     private void initRecycleView(){
-        invoiceAdapter = new InvoiceAdapter(invoiceList, (invoice, position) -> openDialogUpdateItem(invoice, position));
+        InvoiceAdapter invoiceAdapter = new InvoiceAdapter(invoiceList, (invoice, position) -> openDialogUpdateItem(invoice, position));
         rcvInvoices.setAdapter(invoiceAdapter);
     }
 
@@ -110,7 +108,8 @@ public class HistoryFragment extends Fragment {
         edtUpdateTotalCost = dialogUpdate.findViewById(R.id.edt_update_total_cost);
         edtUpdateTimestamp = dialogUpdate.findViewById(R.id.edt_update_timestamp);
         btnCancelUpdate = dialogUpdate.findViewById(R.id.btn_cancel_update);
-        btnUpdate = dialogUpdate.findViewById(R.id.btn_update);
+        Button btnUpdate = dialogUpdate.findViewById(R.id.btn_update);
+        imgButtonCalendar = dialogUpdate.findViewById(R.id.btn_calendar_invoice);
 
         edtUpdateSeller.setText(invoice.getSeller());
         edtUpdateAddress.setText(invoice.getAddress());
@@ -123,61 +122,56 @@ public class HistoryFragment extends Fragment {
             updateItem(invoice, position);
         });
 
+        imgButtonCalendar.setOnClickListener(v -> displayCalendar());
+
         dialogUpdate.show();
     }
 
     private void updateItem(InvoiceModel invoice, int postion){
 
-        FirebaseDatabase database = FirebaseDatabase.getInstance("https://smart-shouhi-default-rtdb.asia-southeast1.firebasedatabase.app/");
-        DatabaseReference myRef = database.getReference();
-        myRef.child("totalUser").get().addOnCompleteListener(task -> {
-            if(task.isSuccessful()){
-                setTotalUser(Long.parseLong(String.valueOf(task.getResult().getValue())));
-//                getIdUserCurrentToUpdate(invoice, postion);
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, URL_UPDATE_A_INVOICE, new com.android.volley.Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+
+                response = response.substring(1, response.length()-1);
+                String[] listResult = response.split("#");
+                if(listResult[0].equals("200")){
+
+                    Toast.makeText(getActivity(), listResult[1], Toast.LENGTH_SHORT).show();
+                    dialogUpdate.dismiss();
+                    processingData();
+                }else {
+                    Toast.makeText(getActivity(), listResult[1], Toast.LENGTH_SHORT).show();
+                    dialogUpdate.dismiss();
+                }
+
             }
-        });
-    }
+        }, error -> {
+            Toast.makeText(getActivity(), "Error 500", Toast.LENGTH_SHORT).show();
+            dialogUpdate.dismiss();
+        }){
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String,String> params = new HashMap<>();
 
+                String seller = edtUpdateSeller.getText().toString().trim();
+                String address = edtUpdateAddress.getText().toString().trim();
+                String timestamp = edtUpdateTimestamp.getText().toString().trim();
+                String totalCost = edtUpdateTotalCost.getText().toString().trim();
+                int id = invoice.getId();
 
-    private void updateItemInList(Invoice invoice, int postion){
-
-
-        FirebaseDatabase database = FirebaseDatabase.getInstance("https://smart-shouhi-default-rtdb.asia-southeast1.firebasedatabase.app/");
-        DatabaseReference myRef = database.getReference(getIndexUserCurrent()+"/invoices/"+postion);
-
-        myRef.get().addOnCompleteListener(task -> {
-            if(task.isSuccessful()){
-//                invoice.setId(postion);
-                InvoiceModel invoiceModel = new InvoiceModel();
-                invoiceModel.setId(postion);
-                invoiceModel.setSeller(edtUpdateSeller.getText().toString().trim());
-                invoiceModel.setAddress(edtUpdateAddress.getText().toString().trim());
-                invoiceModel.setTotalCost(Float.parseFloat(edtUpdateTotalCost.getText().toString().trim()));
-                invoiceModel.setTimestamp(edtUpdateTimestamp.getText().toString().trim());
-                myRef.setValue(invoiceModel);
-
-                Toast.makeText(getActivity(), "Update Successed", Toast.LENGTH_LONG);
-                dialogUpdate.dismiss();
-//                getTotalUserOnFb();
+                params.put("seller", seller);
+                params.put("address", address);
+                params.put("timestamp", timestamp);
+                params.put("totalcost", totalCost);
+                params.put("invoiceId", String.valueOf(id));
+                return params;
             }
-        });
+        };
+
+        requestQueue.add(stringRequest);
     }
 
-    public long getTotalUser() {
-        return totalUser;
-    }
-
-    public void setTotalUser(long totalUser) {
-        this.totalUser = totalUser;
-    }
-
-    public int getIndexUserCurrent() {
-        return indexUserCurrent;
-    }
-
-    public void setIndexUserCurrent(int indexUserCurrent) {
-        this.indexUserCurrent = indexUserCurrent;
-    }
 
 
     private void processingData() {
@@ -227,5 +221,25 @@ public class HistoryFragment extends Fragment {
 
         requestQueue.add(stringRequest);
 
+    }
+
+    private void displayCalendar() {
+        final View dialogView = View.inflate(getActivity(), R.layout.layout_date_picker, null);
+        final AlertDialog alertDialog = new AlertDialog.Builder(getActivity()).create();
+
+        dialogView.findViewById(R.id.date_time_set).setOnClickListener(view -> {
+
+            DatePicker datePicker = dialogView.findViewById(R.id.date_picker);
+
+            Calendar calendar = new GregorianCalendar(datePicker.getYear(),
+                    datePicker.getMonth(),
+                    datePicker.getDayOfMonth());
+            String currentDate = DateFormat.format("yyyy-MM-dd", calendar).toString();
+            edtUpdateTimestamp.setText(currentDate);
+
+            alertDialog.dismiss();
+        });
+        alertDialog.setView(dialogView);
+        alertDialog.show();
     }
 }

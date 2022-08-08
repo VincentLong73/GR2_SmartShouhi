@@ -2,14 +2,14 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/action_home"
-        android:title="Home"
+        android:title="Trang chủ"
         android:icon="@drawable/baseline_home_black_36"/>
     <item
         android:id="@+id/action_person"
-        android:title="Person"
+        android:title="Tài khoản"
         android:icon="@drawable/baseline_person_black_36"/>
     <item
         android:id="@+id/action_info"
-        android:title="About us"
+        android:title="Thông tin ứng dung"
         android:icon="@drawable/baseline_info_black_36"/>
 </menu>

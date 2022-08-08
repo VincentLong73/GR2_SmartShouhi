@@ -12,33 +12,17 @@ public class UserModel {
     private boolean isAdmin;
     private boolean isActive;
 
-    public UserModel(int id, String email, String userName, String fullName, String dob, String phone, String password, boolean isAdmin, boolean isActive) {
+    public UserModel(int id, String email, String userName, String fullName, String phone, boolean isAdmin, boolean isActive, String dob) {
         this.id = id;
         this.email = email;
         this.userName = userName;
         this.fullName = fullName;
         this.dob = dob;
         this.phone = phone;
-        this.password = password;
         this.isAdmin = isAdmin;
         this.isActive = isActive;
     }
 
-    //    public UserModel(int id, String email, String userName, String fullName,String phone, boolean isAdmin) {
-//        this.id = id;
-//        this.email = email;
-//        this.userName = userName;
-//        this.fullName = fullName;
-//        this.phone = phone;
-//        this.isAdmin = isAdmin;
-//    }
-//
-//    public UserModel(String email, String userName, String dob, String password) {
-//        this.email = email;
-//        this.userName = userName;
-//        Dob = dob;
-//        this.password = password;
-//    }
 
     public int getId() {
         return id;

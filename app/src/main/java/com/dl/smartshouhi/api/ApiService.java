@@ -3,6 +3,7 @@ package com.dl.smartshouhi.api;
 import com.dl.smartshouhi.model.InvoiceItemModel;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 
 import java.util.concurrent.TimeUnit;
 
@@ -31,7 +32,7 @@ public interface ApiService {
 
     ApiService apiService = new Retrofit.Builder()
 //            .baseUrl("http://10.0.3.2:5000/")
-            .baseUrl("http://d27c-34-90-203-143.ngrok.io/")
+            .baseUrl("http://7d88-35-245-95-19.ngrok.io/")
             .addConverterFactory(GsonConverterFactory.create(gson))
             .client(okHttpClient)
             .build()
@@ -45,9 +46,10 @@ public interface ApiService {
 //    @POST("api/send-image")
 //    Call<Image> getInformationInvoice1(@Part MultipartBody.Part img);
 
+    @Headers({"Accept: application/json"})
     @Multipart
-    @POST("api-get-in4")
-    Call<InvoiceItemModel> getInformationInvoice2(@Part MultipartBody.Part img);
-
+    @POST("api/get-in4")
+//    Call<InvoiceItemModel> getInformationInvoice2(@Part MultipartBody.Part img);
+    Call<JsonObject> getInformationInvoice2(@Part MultipartBody.Part img);
 
 }

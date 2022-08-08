@@ -29,7 +29,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="36dp"
-        android:text="Welcome to SmartShouhi"
+        android:text="Chào mừng đến SmartShouhi"
         android:textColor="@color/purple_700"
         android:textSize="20sp"
         android:textStyle="bold|italic"
@@ -82,7 +82,7 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="100dp"
         android:background="@drawable/background_btn"
-        android:text="Login"
+        android:text="Đăng nhập"
         android:textColor="#5B36F3"
         android:textSize="18sp"
         android:textStyle="bold"
@@ -104,7 +104,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Forgot Password?"
+            android:text="Quên mật khẩu?"
             android:textColor="@color/purple_500"
             android:textSize="14sp"
             android:textStyle="bold" />
@@ -129,7 +129,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Don't have an account"
+            android:text="Bạn chưa có tài khoản"
             android:textSize="14sp"
             android:textStyle="bold" />
 
@@ -137,7 +137,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="5dp"
-            android:text="Sign up"
+            android:text="Đăng ký"
             android:textColor="@color/purple_500"
             android:textSize="16sp"
             android:textStyle="bold|italic" />

@@ -81,21 +81,6 @@ public class ChartFragment extends Fragment {
         initUI();
 
         btnSwitch.setOnCheckedChangeListener((compoundButton, b) -> {
-
-
-
-//            if(btnSwitch.isChecked()){
-////                processingDataYear();
-//                if(isFlag){
-//                    processingDataYear();
-//                    isFlag = false;
-//                }else {
-//                    processingDataWeek();
-//                    isFlag = true;
-//                }
-//            }else{
-//                processingDataWeek();
-//            }
             if(isFirst){
                 isFirst = false;
             }else{
@@ -124,14 +109,6 @@ public class ChartFragment extends Fragment {
                         processingDataYear();
                     }
                 }
-
-
-//                if(btnSwitch.isChecked()){
-//                    processingDataYear();
-//                }else{
-//                    processingDataWeek();
-//                }
-
             }
 
             @Override
@@ -234,7 +211,7 @@ public class ChartFragment extends Fragment {
                         }
                     }
 
-                    replaceFragmentChart(totalCostOfListInvoiceYear,MONTHS,MAX_X_VALUE_MONTH);
+                    replaceFragmentChart(totalCostOfListInvoiceWeek,DAYS,MAX_X_VALUE);
 
                 }else {
                     // If sign in fails, display a message to the user.
@@ -304,7 +281,7 @@ public class ChartFragment extends Fragment {
                         }
                     }
 
-                    replaceFragmentChart(totalCostOfListInvoiceWeek,DAYS,MAX_X_VALUE);
+                    replaceFragmentChart(totalCostOfListInvoiceYear,MONTHS,MAX_X_VALUE_MONTH);
 
                 }else {
                     // If sign in fails, display a message to the user.

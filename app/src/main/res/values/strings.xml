@@ -1,17 +1,17 @@
 <resources>
     <string name="app_name">SmartShouhi</string>
 
-    <string name="nav_home">Home</string>
+    <string name="nav_home">Trang chủ</string>
     <string name="nav_favorite">Favorite</string>
-    <string name="nav_history">History</string>
-    <string name="nav_account">Account</string>
+    <string name="nav_history">Lịch sử</string>
+    <string name="nav_account">Tài khoản</string>
     <string name="nav_profile">My Profile</string>
-    <string name="nav_change_password">Change Password</string>
+    <string name="nav_change_password">Thay đổi mật khẩu</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="nav_sign_out">Sign Out</string>
-    <string name="nav_bar_chart">Chart</string>
-    <string name="nav_post_add">Add An Invoice</string>
+    <string name="nav_sign_out">Đăng xuất</string>
+    <string name="nav_bar_chart">Biểu đồ</string>
+    <string name="nav_post_add">Thêm hóa đơn</string>
     <string name="content_image_top_home">image in top</string>
 </resources>

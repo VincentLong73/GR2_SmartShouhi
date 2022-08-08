@@ -20,6 +20,7 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:orientation="horizontal"
+
             >
 
             <androidx.cardview.widget.CardView
@@ -43,8 +44,8 @@
 
                     <ImageView
                         android:id="@+id/ic_user"
-                        android:layout_width="100dp"
-                        android:layout_height="100dp"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
                         android:layout_gravity="center"
                         android:layout_margin="2dp"
                         android:src="@drawable/ic_avatar_default"
@@ -70,9 +71,10 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="bottom|center_horizontal"
-                        android:hint="Users"
+                        android:hint="Tài khoản"
                         android:textSize="20sp"
                         android:textStyle="bold"
+                        android:padding="3sp"
                         app:layout_constraintEnd_toEndOf="@+id/tv_user_number"
                         app:layout_constraintStart_toStartOf="@+id/tv_user_number"
                         app:layout_constraintTop_toBottomOf="@+id/tv_user_number" />
@@ -102,11 +104,11 @@
 
                     <ImageView
                         android:id="@+id/ic_invoice"
-                        android:layout_width="100dp"
-                        android:layout_height="100dp"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
                         android:layout_gravity="center"
                         android:layout_margin="2dp"
-                        android:src="@drawable/ic_avatar_default"
+                        app:srcCompat="@drawable/ic_invoice"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
@@ -129,7 +131,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="bottom|center_horizontal"
-                        android:hint="Invoices"
+                        android:hint="Hóa đơn"
+                        android:padding="3sp"
                         android:textSize="20sp"
                         android:textStyle="bold"
                         app:layout_constraintEnd_toEndOf="@+id/tv_invoice_number"
@@ -162,11 +165,11 @@
 
                     <ImageView
                         android:id="@+id/ic_item"
-                        android:layout_width="100dp"
-                        android:layout_height="100dp"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
                         android:layout_gravity="center"
                         android:layout_margin="2dp"
-                        android:src="@drawable/ic_avatar_default"
+                        app:srcCompat="@drawable/ic_item"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
@@ -189,7 +192,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="bottom|center_horizontal"
-                        android:hint="Items"
+                        android:hint="Sản phẩm"
+                        android:padding="3sp"
                         android:textSize="20sp"
                         android:textStyle="bold"
                         app:layout_constraintEnd_toEndOf="@+id/tv_item_number"

@@ -16,7 +16,7 @@
             android:padding="2dp"
             android:gravity="center"
             android:scaleType="center"
-            android:text="Add New A Item"
+            android:text="Thông tin sản phẩm"
             android:textStyle="bold"
             android:textSize="20sp"
             android:textColor="#ffffff"
@@ -110,7 +110,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Save"
+                android:text="Lưu"
                 android:background="@drawable/background_btn"
                 android:textColor="#0090ff"
                 android:textSize="18sp" />

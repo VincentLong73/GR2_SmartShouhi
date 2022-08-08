@@ -73,19 +73,12 @@ public class HomeFragment extends Fragment {
         imgAddInvoice = mView.findViewById(R.id.img_add_an_invoice);
         imgChart = mView.findViewById(R.id.img_chart);
         imgHistory = mView.findViewById(R.id.img_history);
-        imgFavorite = mView.findViewById(R.id.img_favorite);
+//        imgFavorite = mView.findViewById(R.id.img_favorite);
 
 
     }
 
     private void setUserInformation(){
-//        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-//        if(user == null){
-//            return;
-//        }
-//
-//        tvUsername.setText(user.getDisplayName());
-//        Glide.with(homeActivity).load(user.getPhotoUrl()).error(R.drawable.ic_avatar_default).into(imgAvatar);
 
         sharedpreferences = this.getActivity().getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
 
@@ -107,7 +100,7 @@ public class HomeFragment extends Fragment {
 
         imgHistory.setOnClickListener(v -> onClickShowHistory());
 
-        imgFavorite.setOnClickListener(v -> onClickShowFavorite());
+//        imgFavorite.setOnClickListener(v -> onClickShowFavorite());
 
     }
 

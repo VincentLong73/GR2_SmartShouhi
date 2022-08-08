@@ -17,7 +17,7 @@
         android:padding="2dp"
         android:gravity="center"
         android:scaleType="center"
-        android:text="Update Profile"
+        android:text="Thay đổi thông tin cá nhân"
         android:textStyle="bold"
         android:textSize="20sp"
         android:textColor="#ffffff"
@@ -61,14 +61,7 @@
         android:background="@drawable/edittext_background"
         android:orientation="horizontal"
         android:padding="2sp">
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="match_parent"-->
-<!--        android:layout_marginStart="10dp"-->
-<!--        android:layout_marginTop="10dp"-->
-<!--        android:layout_marginEnd="10dp"-->
-<!--        android:layout_marginBottom="5dp"-->
-<!--        android:elevation="5dp"-->
-<!--        android:orientation="horizontal">-->
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
@@ -94,18 +87,11 @@
         android:background="@drawable/edittext_background"
         android:orientation="horizontal"
         android:padding="2sp">
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="match_parent"-->
-<!--        android:layout_marginStart="10dp"-->
-<!--        android:layout_marginTop="10dp"-->
-<!--        android:layout_marginEnd="10dp"-->
-<!--        android:layout_marginBottom="5dp"-->
-<!--        android:elevation="5dp"-->
-<!--        android:orientation="horizontal">-->
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:text="Full Name"
+            android:text="Họ và tên"
             android:textColor="#0090ff"
             android:textSize="18sp" />
         <EditText
@@ -133,7 +119,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Date of Birth"
+            android:text="Năm sinh"
             android:textColor="#0090ff"
             android:textSize="16sp"
             android:textStyle="bold" />
@@ -186,7 +172,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Mobile"
+            android:text="Số điện thoại"
             android:textColor="#0090ff"
             android:textSize="18sp" />
 
@@ -222,7 +208,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Cancel"
+            android:text="Hủy"
             android:background="@drawable/background_btn"
             android:textColor="#0090ff"
             android:textSize="18sp" />
@@ -232,7 +218,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Update"
+            android:text="Cập nhật"
             android:background="@drawable/background_btn"
             android:textColor="#505050"
             android:textSize="16sp" />

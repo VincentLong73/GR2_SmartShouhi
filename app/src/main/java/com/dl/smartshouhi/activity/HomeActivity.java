@@ -20,26 +20,21 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.dl.smartshouhi.R;
+import com.dl.smartshouhi.fragment.AboutUsFragment;
 import com.dl.smartshouhi.fragment.HomeAdminFragment;
 import com.dl.smartshouhi.fragment.HomeFragment;
 import com.dl.smartshouhi.fragment.InvoiceInformationFragment;
-import com.dl.smartshouhi.fragment.InvoiceInformationFragment1;
-import com.dl.smartshouhi.fragment.MyProfileFragment;
 import com.dl.smartshouhi.fragment.PersonFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.io.IOException;
 import java.util.Objects;
 
-import static com.dl.smartshouhi.constaint.Constant.EMAIL_KEY;
 import static com.dl.smartshouhi.constaint.Constant.ISADMIN_KEY;
-import static com.dl.smartshouhi.constaint.Constant.PASSWORD_KEY;
 import static com.dl.smartshouhi.constaint.Constant.SHARED_PREFS;
 
 public class HomeActivity extends AppCompatActivity {
 
-
-    final private MyProfileFragment myProfileFragment = new MyProfileFragment();
     final private PersonFragment personFragment = new PersonFragment();
     final private InvoiceInformationFragment invoiceInformationFragment = new InvoiceInformationFragment();
     final private HomeFragment homeFragment = new HomeFragment(invoiceInformationFragment);
@@ -153,7 +148,7 @@ public class HomeActivity extends AppCompatActivity {
                 title = "Smart Shouhi";
                 break;
             case FRAGMENT_PERSON:
-                title = "Thong tin ca nhan";
+                title = "Thông tin cá nhân";
                 break;
             case FRAGMENT_ABOUT_US:
                 title = "About us";
@@ -181,7 +176,7 @@ public class HomeActivity extends AppCompatActivity {
                     replaceFragment(personFragment, FRAGMENT_PERSON);
                     break;
                 case R.id.action_info:
-                    replaceFragment(new InvoiceInformationFragment1(), FRAGMENT_ABOUT_US);
+                    replaceFragment(new AboutUsFragment(), FRAGMENT_ABOUT_US);
                     break;
             }
             return true;

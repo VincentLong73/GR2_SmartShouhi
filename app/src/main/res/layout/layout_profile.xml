@@ -205,7 +205,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Full name"
+                        android:text="Họ và tên"
                         android:textColor="#0090ff"
                         android:textSize="18sp" />
 
@@ -241,7 +241,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Dob"
+                        android:text="Năm sinh"
                         android:textColor="#0090ff"
                         android:textSize="18sp" />
 
@@ -279,7 +279,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Mobile"
+                        android:text="Số điện thoại"
                         android:textColor="#0090ff"
                         android:textSize="18sp" />
 
@@ -309,7 +309,7 @@
                         android:padding="5dp"
                         android:layout_weight="1"
                         android:background="@drawable/background_btn"
-                        android:text="Edit Profile"
+                        android:text="Thay đổi thông tin"
                         android:textColor="#000000"
                         android:textSize="10sp"
                         android:textStyle="bold"
@@ -327,7 +327,7 @@
                         android:layout_marginEnd="8dp"
                         android:drawableLeft="@drawable/ic_lock"
                         android:background="@drawable/background_btn"
-                        android:text="Change Password"
+                        android:text="Thay đổi mật khẩu"
                         android:textColor="#000000"
                         android:textSize="10sp"
                         android:textStyle="bold" />

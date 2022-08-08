@@ -11,6 +11,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.format.DateFormat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,11 +39,16 @@ import com.android.volley.toolbox.Volley;
 import com.dl.smartshouhi.R;
 import com.dl.smartshouhi.activity.HomeActivity;
 import com.dl.smartshouhi.adapter.ItemAdapter;
+import com.dl.smartshouhi.api.ApiService;
 import com.dl.smartshouhi.model.InvoiceItemModel;
 import com.dl.smartshouhi.model.ItemTest;
+import com.dl.smartshouhi.util.RealPathUtil;
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 
+import java.io.File;
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -51,6 +57,14 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 import static com.dl.smartshouhi.constaint.Constant.ID_KEY;
 import static com.dl.smartshouhi.constaint.Constant.INVOICE_ITEMS;
@@ -213,13 +227,11 @@ public class InvoiceInformationFragment extends Fragment {
                 new TypeToken<ArrayList<ItemTest>>() {}.getType());
 //        Toast.makeText(getActivity(), strListItem, Toast.LENGTH_SHORT).show();
 
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, URL_ADD_LIST_ITEM, new com.android.volley.Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, URL_ADD_LIST_ITEM, response -> {
 
-                response = response.substring(1, response.length()-1);
-                String[] listResult = response.split("#");
-                Toast.makeText(getActivity(), listResult[1], Toast.LENGTH_SHORT).show();
+            response = response.substring(1, response.length()-1);
+            String[] listResult = response.split("#");
+            Toast.makeText(getActivity(), listResult[1], Toast.LENGTH_SHORT).show();
 //                if(listResult[0].equals("200")){
 //
 //                    Toast.makeText(getActivity(), "Add Item Successfully :", Toast.LENGTH_SHORT).show();
@@ -227,7 +239,6 @@ public class InvoiceInformationFragment extends Fragment {
 //                    Toast.makeText(getActivity(), "Add Item  failed.", Toast.LENGTH_SHORT).show();
 //                }
 
-            }
         }, error -> {
             Toast.makeText(getActivity(), "Error 500", Toast.LENGTH_SHORT).show();
         }){
@@ -314,86 +325,103 @@ public class InvoiceInformationFragment extends Fragment {
 
         mProressDialog.show();
 
-            StringRequest stringRequest = new StringRequest(Request.Method.GET, URL_INFO_A_INVOICE, new com.android.volley.Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
 
-                response = response.replace("\\", "");
-                response = response.replace("\"{", "{");
-                response = response.replace("}\"", "}");
-                response = response.substring(1, response.length()-1);
-                Gson gson = new Gson();
-                String[] listResult = response.split("#");
-                if(listResult[0].equals("200")){
-                    InvoiceItemModel invoiceItemModel = gson.fromJson(listResult[1], InvoiceItemModel.class);
-                    try {
-                        SharedPreferences.Editor editor = sharedpreferences.edit();
-                        editor.putString(INVOICE_ITEMS, response);
-                        // to save our data with key and value.
-                        editor.apply();
-                        Toast.makeText(getActivity(), "Get Invoice Successfully", Toast.LENGTH_SHORT).show();
-                        mProressDialog.dismiss();
-                        showDialogInvoice(invoiceItemModel);
-                    } catch (ParseException e) {
-                        e.printStackTrace();
-                    }
-
-
-
-                }else {
-                    // If sign in fails, display a message to the user.
-                    Toast.makeText(getActivity(), "Authentication failed.", Toast.LENGTH_SHORT).show();
-                    mProressDialog.dismiss();
-                }
-
-            }
-        }, error -> {
-            Toast.makeText(getActivity(), "Error 500", Toast.LENGTH_SHORT).show();
-        }){
-            @Override
-            protected Map<String, String> getParams() {
-
-                return null;
-            }
-        };
-
-            requestQueue.add(stringRequest);
 
 //        String strRealPath = RealPathUtil.getRealPath(getActivity(), mUri);
 //        Log.e("DuynDuyn", strRealPath);
 //        File file = new File(strRealPath);
 //        RequestBody requestBodyImg = RequestBody.create(MediaType.parse("multipart/form-data"), file);
 //        MultipartBody.Part multipartBodyImg = MultipartBody.Part.createFormData("image", file.getName(), requestBodyImg);
-
-//        ApiService.apiService.getInformationInvoice().enqueue(new Callback<InvoiceItemModel>() {
+//
+//        StringRequest stringRequest = new StringRequest(Request.Method.GET, URL_INFO_A_INVOICE, new com.android.volley.Response.Listener<String>() {
 //            @Override
-//            public void onResponse(Call<InvoiceItemModel> call, Response<InvoiceItemModel> response) {
+//            public void onResponse(String response) {
 //
-//                InvoiceItemModel invoiceItemModel = response.body();
+//                response = response.replace("\\", "");
+//                response = response.replace("\"{", "{");
+//                response = response.replace("}\"", "}");
+//                response = response.substring(1, response.length()-1);
+//                Gson gson = new Gson();
+//                String[] listResult = response.split("#");
+//                if(listResult[0].equals("200")){
+//                    InvoiceItemModel invoiceItemModel = gson.fromJson(listResult[1], InvoiceItemModel.class);
+//                    try {
+//                        SharedPreferences.Editor editor = sharedpreferences.edit();
+//                        editor.putString(INVOICE_ITEMS, response);
+//                        // to save our data with key and value.
+//                        editor.apply();
+//                        Toast.makeText(getActivity(), "Get Invoice Successfully", Toast.LENGTH_SHORT).show();
+//                        mProressDialog.dismiss();
+//                        showDialogInvoice(invoiceItemModel);
+//                    } catch (ParseException e) {
+//                        e.printStackTrace();
+//                    }
 //
-//                if(invoiceItemModel != null){
-//                    Toast.makeText(getActivity(), "Call Api Successfully", Toast.LENGTH_SHORT).show();
-//                }
-
-//                Invoice invoice = response.body();
-//                if(invoice != null){
+//
+//
+//                }else {
+//                    // If sign in fails, display a message to the user.
+//                    Toast.makeText(getActivity(), "Authentication failed.", Toast.LENGTH_SHORT).show();
 //                    mProressDialog.dismiss();
-//                    edtSeller.setText(invoice.getSeller());
-//                    edtAddress.setText(invoice.getAddress());
-//                    edtTimestamp.setText(invoice.getTimestamp());
-//                    edtTotalCost.setText(invoice.getTotalCost()+"");
 //                }
-
-
-//            }
 //
-//            @Override
-//            public void onFailure(Call<InvoiceItemModel> call, Throwable t) {
-//                mProressDialog.dismiss();
-//                t.printStackTrace();
-//                Toast.makeText(getActivity(), "Call Api False", Toast.LENGTH_SHORT).show();
 //            }
-//        });
+//        }, error -> {
+//            Toast.makeText(getActivity(), "Error 500", Toast.LENGTH_SHORT).show();
+//        }){
+//            @Override
+//            protected Map<String, MultipartBody.Part> getParams() {
+//                Map<String, MultipartBody.Part> param = new HashMap<>();
+//                param.put("image", multipartBodyImg);
+//                return param;
+//            }
+//        };
+//
+//            requestQueue.add(stringRequest);
+
+        String strRealPath = RealPathUtil.getRealPath(getActivity(), mUri);
+        Log.e("DuynDuyn", strRealPath);
+        File file = new File(strRealPath);
+        RequestBody requestBodyImg = RequestBody.create(MediaType.parse("multipart/form-data"), file);
+        MultipartBody.Part multipartBodyImg = MultipartBody.Part.createFormData("image", file.getName(), requestBodyImg);
+
+        ApiService.apiService.getInformationInvoice2(multipartBodyImg).enqueue(new Callback<JsonObject>() {
+            @Override
+            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                String strResult = response.body().toString();
+                strResult = strResult.replace("\\", "");
+                strResult = strResult.replace("\"{", "{");
+                strResult = strResult.replace("}\"", "}");
+
+                Gson gson = new Gson();
+
+                InvoiceItemModel invoiceItemModel = gson.fromJson(strResult, InvoiceItemModel.class);
+                if(invoiceItemModel != null){
+                    try {
+                        SharedPreferences.Editor editor = sharedpreferences.edit();
+                        editor.putString(INVOICE_ITEMS, strResult);
+                        // to save our data with key and value.
+                        editor.apply();
+                        mProressDialog.dismiss();
+                        Toast.makeText(getActivity(), "Get Invoice Successfully", Toast.LENGTH_SHORT).show();
+                        showDialogInvoice(invoiceItemModel);
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+                }else {
+                    mProressDialog.dismiss();
+                    Toast.makeText(getActivity(), "Get Invoice failed.", Toast.LENGTH_SHORT).show();
+                }
+
+            }
+
+            @Override
+            public void onFailure(Call<JsonObject> call, Throwable t) {
+                mProressDialog.dismiss();
+                t.printStackTrace();
+                Toast.makeText(getActivity(), "Call Api False", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void addItem(Integer position){
@@ -402,6 +430,7 @@ public class InvoiceInformationFragment extends Fragment {
         String itemCost = edtItemCost.getText().toString().trim();
 
         itemList.get(position).setCost_item(Float.parseFloat(itemCost));
+//        itemList.get(position).setCost_item(itemCost);
         itemList.get(position).setItem_name(itemName);
         dialogItem.dismiss();
 

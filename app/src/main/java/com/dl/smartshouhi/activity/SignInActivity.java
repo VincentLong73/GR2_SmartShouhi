@@ -111,13 +111,11 @@ public class SignInActivity extends AppCompatActivity {
             response = response.replace("\\", "");
             response = response.replace("\"{", "{");
             response = response.replace("}\"", "}");
-            response = response.substring(1, response.length()-1);
+            response = response.substring(1, response.length());
             Gson gson = new Gson();
             String[] listResult = response.split("#");
-            UserModel userModel = gson.fromJson(listResult[1].trim(), UserModel.class);
-//            UserModel userModel = gson.fromJson(response, UserModel.class);
             if(listResult[0].equals("200")){
-
+                UserModel userModel = gson.fromJson(listResult[1], UserModel.class);
                 SharedPreferences.Editor editor = sharedpreferences.edit();
 
                 // below two lines will put values for
@@ -141,20 +139,9 @@ public class SignInActivity extends AppCompatActivity {
                 i = new Intent(SignInActivity.this, HomeActivity.class);
                 startActivity(i);
 
-
-                //finish();
-//                    finishAffinity();
             }else {
-                String emailResult = userModel.getEmail();
                 mProgressDialog.dismiss();
                 Toast.makeText(SignInActivity.this, listResult[1], Toast.LENGTH_SHORT).show();
-                // If sign in fails, display a message to the user.
-//                if(Integer.parseInt(emailResult.trim()) == 201){
-//                    Toast.makeText(SignInActivity.this, "The email or password do not match those on file. Or you have not activated your account.", Toast.LENGTH_SHORT).show();
-//                }else{
-//                    Toast.makeText(SignInActivity.this, "Please fill in all the required fields", Toast.LENGTH_SHORT).show();
-//                }
-
             }
 
         }, error -> {

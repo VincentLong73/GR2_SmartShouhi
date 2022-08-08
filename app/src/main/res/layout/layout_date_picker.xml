@@ -25,7 +25,7 @@
         android:layout_marginTop="16dp"
         android:layout_marginEnd="64dp"
         android:background="@drawable/background_btn"
-        android:text="Setup"
+        android:text="Cài đặt"
         android:textColor="#072BF4"
         android:textSize="18sp"
         android:textStyle="bold"

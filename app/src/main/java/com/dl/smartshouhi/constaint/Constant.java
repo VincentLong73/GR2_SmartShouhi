@@ -18,7 +18,7 @@ public class Constant {
 
     public static final String INVOICE_ITEMS = "invoice_items";
 
-    private static final String PREFIX_URL = " http://192.168.1.5/do_an";
+    private static final String PREFIX_URL = " http://192.168.1.6/do_an";
     //login
     public static final String URL_LOGIN = PREFIX_URL + "/login/login.php";
     public static final String URL_REGIS = PREFIX_URL + "/login/register.php";
@@ -30,6 +30,7 @@ public class Constant {
     public static final String URL_GET_INVOICE_BY_USER_ID = PREFIX_URL + "/invoice/get_invoice_by_userId.php?id=";
     public static final String URL_GET_INVOICE_BY_USER_ID_YEAR = PREFIX_URL + "/invoice/get_invoice_by_userId_year.php?";
     public static final String URL_ADD_A_INVOICE = PREFIX_URL + "/invoice/add_invoice.php";
+    public static final String URL_UPDATE_A_INVOICE = PREFIX_URL + "/invoice/update_invoice.php";
     public static final String URL_INFO_A_INVOICE ="http://7ec6-34-123-39-112.ngrok.io/api/get-in4";
 
     //item

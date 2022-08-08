@@ -322,39 +322,36 @@ public class PersonFragment extends Fragment implements NavigationView.OnNavigat
         String strUsername = edtUserNameUpdate.getText().toString().trim();
         String strPhone = edtPhoneUpdate.getText().toString().trim();
         String strDob = edtDob.getText().toString().trim();
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, URL_CHANGE_PROFILE, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, URL_CHANGE_PROFILE, response -> {
 
-                response = response.replace("\\", "");
-                response = response.replace("\"{", "{");
-                response = response.replace("}\"", "}");
-                response = response.substring(1, response.length()-1);
-                Gson gson = new Gson();
-                String[] listResult = response.split("#");
-                if(listResult[0].equals("200")){
-                    SharedPreferences.Editor editor = sharedpreferences.edit();
+            response = response.replace("\\", "");
+            response = response.replace("\"{", "{");
+            response = response.replace("}\"", "}");
+            response = response.substring(1, response.length()-1);
+            Gson gson = new Gson();
+            String[] listResult = response.split("#");
+            if(listResult[0].equals("200")){
+                SharedPreferences.Editor editor = sharedpreferences.edit();
 
-                    // below two lines will put values for
-                    // email and password in shared preferences.
-                    editor.putString(FULLNAME_KEY, strFullName);
-                    editor.putString(USERNAME_KEY, strUsername);
-                    editor.putString(PHONE_KEY, strPhone);
-                    editor.putString(DOB_KEY, strDob);
+                // below two lines will put values for
+                // email and password in shared preferences.
+                editor.putString(FULLNAME_KEY, strFullName);
+                editor.putString(USERNAME_KEY, strUsername);
+                editor.putString(PHONE_KEY, strPhone);
+                editor.putString(DOB_KEY, strDob);
 
-                    // to save our data with key and value.
-                    editor.apply();
+                // to save our data with key and value.
+                editor.apply();
 
-                    Toast.makeText(getActivity(), listResult[1], Toast.LENGTH_SHORT).show();
-                    setUserInformation();
-                    dialogUpdate.dismiss();
+                Toast.makeText(getActivity(), listResult[1], Toast.LENGTH_SHORT).show();
+                setUserInformation();
+                dialogUpdate.dismiss();
 
-                }else {
-                    dialogUpdate.dismiss();
-                    Toast.makeText(getActivity(), listResult[1], Toast.LENGTH_SHORT).show();
-                }
-
+            }else {
+                dialogUpdate.dismiss();
+                Toast.makeText(getActivity(), listResult[1], Toast.LENGTH_SHORT).show();
             }
+
         }, error -> {
             dialogUpdate.dismiss();
             Toast.makeText(getActivity(), "Update Error", Toast.LENGTH_SHORT).show();

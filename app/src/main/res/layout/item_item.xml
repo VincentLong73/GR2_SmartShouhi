@@ -17,14 +17,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="5dp"
-            android:text="Timestamp"/>
+            android:text="Tên sản phẩm"/>
 
         <TextView
             android:id="@+id/tv_item_cost"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="5dp"
-            android:text="Total Cost"/>
+            android:text="Giá"/>
 
     </LinearLayout>
 
@@ -35,7 +35,7 @@
         android:layout_alignParentEnd="true"
         android:layout_centerVertical="true"
         android:padding="2dp"
-        android:text="Update"/>
+        android:text="Cập nhật"/>
 
 
 </RelativeLayout>
