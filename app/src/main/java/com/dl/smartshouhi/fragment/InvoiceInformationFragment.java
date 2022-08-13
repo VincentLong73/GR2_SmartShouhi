@@ -40,8 +40,10 @@ import com.dl.smartshouhi.R;
 import com.dl.smartshouhi.activity.HomeActivity;
 import com.dl.smartshouhi.adapter.ItemAdapter;
 import com.dl.smartshouhi.api.ApiService;
+import com.dl.smartshouhi.api.InvoiceDbApi;
+import com.dl.smartshouhi.api.ItemDbApi;
 import com.dl.smartshouhi.model.InvoiceItemModel;
-import com.dl.smartshouhi.model.ItemTest;
+import com.dl.smartshouhi.model.ItemModel;
 import com.dl.smartshouhi.util.RealPathUtil;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -62,6 +64,7 @@ import java.util.Map;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -71,7 +74,6 @@ import static com.dl.smartshouhi.constaint.Constant.INVOICE_ITEMS;
 import static com.dl.smartshouhi.constaint.Constant.SHARED_PREFS;
 import static com.dl.smartshouhi.constaint.Constant.URL_ADD_A_INVOICE;
 import static com.dl.smartshouhi.constaint.Constant.URL_ADD_LIST_ITEM;
-import static com.dl.smartshouhi.constaint.Constant.URL_INFO_A_INVOICE;
 
 public class InvoiceInformationFragment extends Fragment {
 
@@ -91,24 +93,21 @@ public class InvoiceInformationFragment extends Fragment {
     private Button btnGetIn4, btnSelectImage;
 
     private Uri mUri;
-    private ProgressDialog mProressDialog;
+    private ProgressDialog mProcessDialog;
 
     private Dialog dialogInvoice;
-    private View viewDialogInvoice;
-    private Button btnSaveItem;
     private Button btnSaveInvoice;
-    private Button btnCancleInvoice;
+    private Button btnCancelInvoice;
     private EditText edtItemName;
     private EditText edtItemCost;
 
-    private RequestQueue requestQueue;
     private SharedPreferences sharedpreferences;
     private int invoiceId;
 
     private RecyclerView rcvItems;
-    private ItemAdapter itemAdapter;
-    private List<ItemTest> itemList;
-    private Dialog dialogItem;
+    private List<ItemModel> itemList;
+    private Dialog dialogUpdateItem;
+    private Dialog dialogDeleteItem;
     private Button btnSaveListItem;
 
 
@@ -127,8 +126,8 @@ public class InvoiceInformationFragment extends Fragment {
 
     private void initUI() {
         homeActivity = (HomeActivity) getActivity();
-        mProressDialog = new ProgressDialog(getActivity());
-        mProressDialog.setMessage("Please wait ...");
+        mProcessDialog = new ProgressDialog(getActivity());
+        mProcessDialog.setMessage("Please wait ...");
 
 
 
@@ -144,14 +143,14 @@ public class InvoiceInformationFragment extends Fragment {
 
         dialogInvoice = new Dialog(getActivity());
         dialogInvoice.setCancelable(true);
-        viewDialogInvoice = homeActivity.getLayoutInflater().inflate(R.layout.layout_dialog_add_infor_invoice, null);
+        View viewDialogInvoice = homeActivity.getLayoutInflater().inflate(R.layout.layout_dialog_add_infor_invoice, null);
         dialogInvoice.setContentView(viewDialogInvoice);
         edtSeller = viewDialogInvoice.findViewById(R.id.edt_seller);
         edtAddress = viewDialogInvoice.findViewById(R.id.edt_address);
         edtTimestamp = viewDialogInvoice.findViewById(R.id.edt_timestamp);
         edtTotalCost = viewDialogInvoice.findViewById(R.id.edt_total_cost);
         btnSaveInvoice = viewDialogInvoice.findViewById(R.id.btn_save_invoice);
-        btnCancleInvoice = viewDialogInvoice.findViewById(R.id.btn_cancel_invoice);
+        btnCancelInvoice = viewDialogInvoice.findViewById(R.id.btn_cancel_invoice);
         imgButtonCalendar = viewDialogInvoice.findViewById(R.id.btn_calendar_invoice);
 
 
@@ -165,14 +164,6 @@ public class InvoiceInformationFragment extends Fragment {
 
         /*E- Ket thuc khoi tao UI trong Dialog Update */
 
-        dialogItem = new Dialog(getActivity());
-        dialogItem.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        dialogItem.setContentView(R.layout.layout_dialog_add_item);
-        Window window = dialogItem.getWindow();
-        window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
-        dialogItem.setCancelable(false);
-
-        requestQueue = Volley.newRequestQueue(getActivity());
         sharedpreferences = getActivity().getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
 
     }
@@ -184,28 +175,63 @@ public class InvoiceInformationFragment extends Fragment {
         InvoiceItemModel invoiceItemModel = gson.fromJson(invoice_items, InvoiceItemModel.class);
         itemList = new ArrayList<>();
         itemList = invoiceItemModel.getItem();
-        itemAdapter = new ItemAdapter(itemList, (item, position) -> openDialogItem(item, position));
+        ItemAdapter itemAdapter = new ItemAdapter(itemList, new ItemAdapter.IClickListener() {
+            @Override
+            public void onClickUpdateItem(ItemModel item, int position) {
+                openDialogUpdateItem(item, position);
+            }
+
+            @Override
+            public void onClickDeleteItem(ItemModel item, int position) {
+                openDialogDeleteItem(item, position);
+            }
+        });
         rcvItems.setAdapter(itemAdapter);
         SharedPreferences.Editor editor = sharedpreferences.edit();
         editor.remove(INVOICE_ITEMS);
-        editor.commit();
+        editor.apply();
     }
 
-    private void openDialogItem(ItemTest item, int position){
+    private void openDialogUpdateItem(ItemModel item, int position){
 
-        edtItemName = dialogItem.findViewById(R.id.edt_item_name);
-        edtItemCost = dialogItem.findViewById(R.id.edt_item_cost);
+        dialogUpdateItem = new Dialog(getActivity());
+        dialogUpdateItem.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialogUpdateItem.setContentView(R.layout.layout_dialog_add_item);
+        Window window = dialogUpdateItem.getWindow();
+        window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
+        dialogUpdateItem.setCancelable(false);
 
-        btnSaveItem = dialogItem.findViewById(R.id.btn_save_item);
+
+        edtItemName = dialogUpdateItem.findViewById(R.id.edt_item_name);
+        edtItemCost = dialogUpdateItem.findViewById(R.id.edt_item_cost);
+
+        Button btnSaveItem = dialogUpdateItem.findViewById(R.id.btn_save_item);
 
         edtItemName.setText(item.getItem_name());
         edtItemCost.setText(item.getCost_item()+"");
 
-        btnSaveItem.setOnClickListener(v -> {
-            addItem(position);
-        });
+        btnSaveItem.setOnClickListener(v -> addItem(position));
 
-        dialogItem.show();
+        dialogUpdateItem.show();
+    }
+
+    private void openDialogDeleteItem(ItemModel item, int position){
+
+        dialogDeleteItem = new Dialog(getActivity());
+        dialogDeleteItem.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialogDeleteItem.setContentView(R.layout.layout_dialog_delete_item);
+        Window window = dialogDeleteItem.getWindow();
+        window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
+        dialogDeleteItem.setCancelable(false);
+
+        Button btnCancelDelete = dialogDeleteItem.findViewById(R.id.btn_cancel_delete);
+        Button btnDelete = dialogDeleteItem.findViewById(R.id.btn_delete);
+
+
+        btnCancelDelete.setOnClickListener(v -> dialogDeleteItem.dismiss());
+        btnDelete.setOnClickListener(v -> deleteItem(position));
+
+        dialogDeleteItem.show();
     }
 
     private void initListener() {
@@ -214,91 +240,76 @@ public class InvoiceInformationFragment extends Fragment {
         btnGetIn4.setOnClickListener(v -> CallApi());
         imgButtonCalendar.setOnClickListener(v -> displayCalendar());
         btnSaveInvoice.setOnClickListener(v -> onClickSaveInvoice());
-        btnCancleInvoice.setOnClickListener(v -> dialogInvoice.dismiss());
-        btnSaveListItem.setOnClickListener(v -> {
-            onClickSaveListItem();
-        });
+        btnCancelInvoice.setOnClickListener(v -> dialogInvoice.dismiss());
+        btnSaveListItem.setOnClickListener(v -> onClickSaveListItem());
 
     }
     private void onClickSaveListItem() {
         Gson gson = new Gson();
         String strListItem = gson.toJson(
                 itemList,
-                new TypeToken<ArrayList<ItemTest>>() {}.getType());
-//        Toast.makeText(getActivity(), strListItem, Toast.LENGTH_SHORT).show();
+                new TypeToken<ArrayList<ItemModel>>() {}.getType());
 
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, URL_ADD_LIST_ITEM, response -> {
-
-            response = response.substring(1, response.length()-1);
-            String[] listResult = response.split("#");
-            Toast.makeText(getActivity(), listResult[1], Toast.LENGTH_SHORT).show();
-//                if(listResult[0].equals("200")){
-//
-//                    Toast.makeText(getActivity(), "Add Item Successfully :", Toast.LENGTH_SHORT).show();
-//                }else {
-//                    Toast.makeText(getActivity(), "Add Item  failed.", Toast.LENGTH_SHORT).show();
-//                }
-
-        }, error -> {
-            Toast.makeText(getActivity(), "Error 500", Toast.LENGTH_SHORT).show();
-        }){
+        ItemDbApi.databaseApi.addItem(invoiceId, strListItem).enqueue(new Callback<ResponseBody>() {
             @Override
-            protected Map<String, String> getParams() {
-                Map<String,String> params = new HashMap<>();
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
 
-                params.put("invoiceId", String.valueOf(invoiceId));
-                params.put("listItem", strListItem);
-                return params;
-            }
-        };
-
-        requestQueue.add(stringRequest);
-    }
-    private void onClickSaveInvoice(){
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, URL_ADD_A_INVOICE, new com.android.volley.Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-
-                response = response.substring(1, response.length()-1);
-                Gson gson = new Gson();
-                String[] listResult = response.split("#");
-                if(listResult[0].equals("200")){
-
-                    invoiceId = Integer.parseInt(listResult[1].trim());
-
-                    Toast.makeText(getActivity(), "Add Invoice Successfully" + invoiceId, Toast.LENGTH_SHORT).show();
-                    dialogInvoice.dismiss();
-                    initRecycleView();
-                }else {
+                try {
+                    String result = response.body().string();
+                    String[] listResult = result.split("#");
                     Toast.makeText(getActivity(), listResult[1], Toast.LENGTH_SHORT).show();
-                    dialogInvoice.dismiss();
+
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
 
+
             }
-        }, error -> {
-            Toast.makeText(getActivity(), "Error 500", Toast.LENGTH_SHORT).show();
-            dialogInvoice.dismiss();
-        }){
+
             @Override
-            protected Map<String, String> getParams() {
-                Map<String,String> params = new HashMap<>();
-
-                String seller = edtSeller.getText().toString().trim();
-                String address = edtAddress.getText().toString().trim();
-                String timestamp = edtTimestamp.getText().toString().trim();
-                String totalCost = edtTotalCost.getText().toString().trim();
-                int uid = sharedpreferences.getInt(ID_KEY, 0);
-
-                params.put("seller", seller);
-                params.put("address", address);
-                params.put("timestamp", timestamp);
-                params.put("totalcost", totalCost);
-                params.put("uid", String.valueOf(uid));
-                return params;
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                Toast.makeText(getActivity(), "Error 500", Toast.LENGTH_SHORT).show();
             }
-        };
+        });
+    }
+    private void onClickSaveInvoice(){
 
-        requestQueue.add(stringRequest);
+        String seller = edtSeller.getText().toString().trim();
+        String address = edtAddress.getText().toString().trim();
+        String timestamp = edtTimestamp.getText().toString().trim();
+        String totalCost = edtTotalCost.getText().toString().trim();
+        int uid = sharedpreferences.getInt(ID_KEY, 0);
+
+        InvoiceDbApi.databaseApi.addInvoice(uid, seller, address, totalCost, timestamp).enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                String strResult;
+                try {
+                    strResult = response.body().string();
+                    if(strResult.length() > 1){
+
+                        String[] listResult = strResult.split("#");
+                        if(listResult[0].equals("200")) {
+                            invoiceId = Integer.parseInt(listResult[1].trim());
+                            Toast.makeText(getActivity(), "Lưu hóa đơn thành công", Toast.LENGTH_SHORT).show();
+                            dialogInvoice.dismiss();
+                            initRecycleView();
+                        }else {
+                            Toast.makeText(getActivity(), listResult[1], Toast.LENGTH_SHORT).show();
+                            dialogInvoice.dismiss();
+                        }
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+            }
+        });
+
     }
 
     private void onClickRequestPermission() {
@@ -323,61 +334,7 @@ public class InvoiceInformationFragment extends Fragment {
 
     private void CallApi() {
 
-        mProressDialog.show();
-
-
-
-//        String strRealPath = RealPathUtil.getRealPath(getActivity(), mUri);
-//        Log.e("DuynDuyn", strRealPath);
-//        File file = new File(strRealPath);
-//        RequestBody requestBodyImg = RequestBody.create(MediaType.parse("multipart/form-data"), file);
-//        MultipartBody.Part multipartBodyImg = MultipartBody.Part.createFormData("image", file.getName(), requestBodyImg);
-//
-//        StringRequest stringRequest = new StringRequest(Request.Method.GET, URL_INFO_A_INVOICE, new com.android.volley.Response.Listener<String>() {
-//            @Override
-//            public void onResponse(String response) {
-//
-//                response = response.replace("\\", "");
-//                response = response.replace("\"{", "{");
-//                response = response.replace("}\"", "}");
-//                response = response.substring(1, response.length()-1);
-//                Gson gson = new Gson();
-//                String[] listResult = response.split("#");
-//                if(listResult[0].equals("200")){
-//                    InvoiceItemModel invoiceItemModel = gson.fromJson(listResult[1], InvoiceItemModel.class);
-//                    try {
-//                        SharedPreferences.Editor editor = sharedpreferences.edit();
-//                        editor.putString(INVOICE_ITEMS, response);
-//                        // to save our data with key and value.
-//                        editor.apply();
-//                        Toast.makeText(getActivity(), "Get Invoice Successfully", Toast.LENGTH_SHORT).show();
-//                        mProressDialog.dismiss();
-//                        showDialogInvoice(invoiceItemModel);
-//                    } catch (ParseException e) {
-//                        e.printStackTrace();
-//                    }
-//
-//
-//
-//                }else {
-//                    // If sign in fails, display a message to the user.
-//                    Toast.makeText(getActivity(), "Authentication failed.", Toast.LENGTH_SHORT).show();
-//                    mProressDialog.dismiss();
-//                }
-//
-//            }
-//        }, error -> {
-//            Toast.makeText(getActivity(), "Error 500", Toast.LENGTH_SHORT).show();
-//        }){
-//            @Override
-//            protected Map<String, MultipartBody.Part> getParams() {
-//                Map<String, MultipartBody.Part> param = new HashMap<>();
-//                param.put("image", multipartBodyImg);
-//                return param;
-//            }
-//        };
-//
-//            requestQueue.add(stringRequest);
+        mProcessDialog.show();
 
         String strRealPath = RealPathUtil.getRealPath(getActivity(), mUri);
         Log.e("DuynDuyn", strRealPath);
@@ -388,38 +345,43 @@ public class InvoiceInformationFragment extends Fragment {
         ApiService.apiService.getInformationInvoice2(multipartBodyImg).enqueue(new Callback<JsonObject>() {
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-                String strResult = response.body().toString();
-                strResult = strResult.replace("\\", "");
-                strResult = strResult.replace("\"{", "{");
-                strResult = strResult.replace("}\"", "}");
+                if(response.body() != null){
+                    String strResult = response.body().toString();
+                    strResult = strResult.replace("\\", "");
+                    strResult = strResult.replace("\"{", "{");
+                    strResult = strResult.replace("}\"", "}");
 
-                Gson gson = new Gson();
+                    Gson gson = new Gson();
 
-                InvoiceItemModel invoiceItemModel = gson.fromJson(strResult, InvoiceItemModel.class);
-                if(invoiceItemModel != null){
-                    try {
-                        SharedPreferences.Editor editor = sharedpreferences.edit();
-                        editor.putString(INVOICE_ITEMS, strResult);
-                        // to save our data with key and value.
-                        editor.apply();
-                        mProressDialog.dismiss();
-                        Toast.makeText(getActivity(), "Get Invoice Successfully", Toast.LENGTH_SHORT).show();
-                        showDialogInvoice(invoiceItemModel);
-                    } catch (ParseException e) {
-                        e.printStackTrace();
+                    InvoiceItemModel invoiceItemModel = gson.fromJson(strResult, InvoiceItemModel.class);
+                    if(invoiceItemModel != null){
+                        try {
+                            SharedPreferences.Editor editor = sharedpreferences.edit();
+                            editor.putString(INVOICE_ITEMS, strResult);
+                            // to save our data with key and value.
+                            editor.apply();
+                            mProcessDialog.dismiss();
+                            Toast.makeText(getActivity(), "Trích xuất thông tin thành công", Toast.LENGTH_SHORT).show();
+                            showDialogInvoice(invoiceItemModel);
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
+                    }else {
+                        mProcessDialog.dismiss();
+                        Toast.makeText(getActivity(), "Trích xuất thông tin lỗi", Toast.LENGTH_SHORT).show();
                     }
                 }else {
-                    mProressDialog.dismiss();
-                    Toast.makeText(getActivity(), "Get Invoice failed.", Toast.LENGTH_SHORT).show();
+                    mProcessDialog.dismiss();
+                    Toast.makeText(getActivity(), "Trích xuất thông tin lỗi", Toast.LENGTH_SHORT).show();
                 }
 
             }
 
             @Override
             public void onFailure(Call<JsonObject> call, Throwable t) {
-                mProressDialog.dismiss();
+                mProcessDialog.dismiss();
                 t.printStackTrace();
-                Toast.makeText(getActivity(), "Call Api False", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), "Trích xuất thông tin lỗi", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -430,9 +392,14 @@ public class InvoiceInformationFragment extends Fragment {
         String itemCost = edtItemCost.getText().toString().trim();
 
         itemList.get(position).setCost_item(Float.parseFloat(itemCost));
-//        itemList.get(position).setCost_item(itemCost);
         itemList.get(position).setItem_name(itemName);
-        dialogItem.dismiss();
+        dialogUpdateItem.dismiss();
+
+    }
+
+    private void deleteItem(Integer position){
+        itemList.remove(position);
+        dialogDeleteItem.dismiss();
 
     }
 

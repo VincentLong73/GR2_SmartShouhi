@@ -18,14 +18,12 @@ public class SplashActivity extends AppCompatActivity {
     // variable for shared preferences.
     private SharedPreferences sharedpreferences;
     private String email;
-    private boolean isAdmin;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
         super.onCreate(savedInstanceState);
-        //setContentView(R.layout.activity_splash);
 
         Handler handler = new Handler();
         handler.postDelayed(() -> nextActivity(), 2000);
@@ -37,11 +35,8 @@ public class SplashActivity extends AppCompatActivity {
         // getting data from shared prefs and
         // storing it in our string variable.
         email = sharedpreferences.getString(EMAIL_KEY, null);
-        isAdmin = sharedpreferences.getBoolean(ISADMIN_KEY, false);
-
 
         Intent intent;
-        //if(user == null){
         if(email == null){
             intent = new Intent(this, SignInActivity.class);
         }else{

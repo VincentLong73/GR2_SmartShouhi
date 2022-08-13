@@ -4,12 +4,11 @@ public class UserModel {
 
     private int id;
     private String email;
-    private String userName;
-    private String fullName;
-    private String dob;
-    private String phone;
-    private String password;
-    private boolean isAdmin;
+    private final String userName;
+    private final String fullName;
+    private final String dob;
+    private final String phone;
+    private final boolean isAdmin;
     private boolean isActive;
 
     public UserModel(int id, String email, String userName, String fullName, String phone, boolean isAdmin, boolean isActive, String dob) {
@@ -44,48 +43,20 @@ public class UserModel {
         return userName;
     }
 
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
-
     public String getFullName() {
         return fullName;
-    }
-
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
     }
 
     public String getDob() {
         return dob;
     }
 
-    public void setDob(String dob) {
-        this.dob = dob;
-    }
-
     public boolean isAdmin() {
         return isAdmin;
     }
 
-    public void setAdmin(boolean admin) {
-        isAdmin = admin;
-    }
-
     public String getPhone() {
         return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 
     public boolean isActive() {

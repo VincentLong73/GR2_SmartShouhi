@@ -4,27 +4,29 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.dl.smartshouhi.R;
-import com.dl.smartshouhi.model.InvoiceModel;
+import com.dl.smartshouhi.model.Invoice;
 
 import java.util.List;
 
 
 public class InvoiceAdapter extends RecyclerView.Adapter<InvoiceAdapter.InvoiceViewHolder> {
 
-    private List<InvoiceModel> invoiceList;
-    private IClickListener iClickListener;
+    private final List<Invoice> invoiceList;
+    private final IClickListener iClickListener;
 
     public interface IClickListener{
-        void onClickUpdateItem(InvoiceModel invoice, int position);
+        void onClickUpdateItem(Invoice invoice, int position);
+        void onClickDeleteItem(Invoice invoice, int position);
     }
 
-    public InvoiceAdapter(List<InvoiceModel> invoiceList, IClickListener iClickListener) {
+    public InvoiceAdapter(List<Invoice> invoiceList, IClickListener iClickListener) {
         this.invoiceList = invoiceList;
         this.iClickListener = iClickListener;
     }
@@ -39,8 +41,7 @@ public class InvoiceAdapter extends RecyclerView.Adapter<InvoiceAdapter.InvoiceV
 
     @Override
     public void onBindViewHolder(@NonNull  InvoiceViewHolder holder, int position) {
-//        InvoiceModel invoice = invoiceList.get(position);
-        InvoiceModel invoice = invoiceList.get(position);
+        Invoice invoice = invoiceList.get(position);
         if(invoice == null){
             return;
         }
@@ -49,12 +50,9 @@ public class InvoiceAdapter extends RecyclerView.Adapter<InvoiceAdapter.InvoiceV
         holder.tvTimestamp.setText(invoice.getTimestamp());
         holder.tvTotalCost.setText(invoice.getTotalCost()+"");
 
-        holder.btnUpdateItemInvoice.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                iClickListener.onClickUpdateItem(invoice, position);
-            }
-        });
+        holder.imgBtnUpdate.setOnClickListener(v -> iClickListener.onClickUpdateItem(invoice, position));
+        holder.imgBtnDelete.setOnClickListener(v -> iClickListener.onClickDeleteItem(invoice, position));
+
     }
 
     @Override
@@ -65,9 +63,14 @@ public class InvoiceAdapter extends RecyclerView.Adapter<InvoiceAdapter.InvoiceV
         return 0;
     }
 
-    public class InvoiceViewHolder extends RecyclerView.ViewHolder{
-        private TextView tvSeller, tvAddress, tvTimestamp, tvTotalCost;
-        private Button btnUpdateItemInvoice;
+    public static class InvoiceViewHolder extends RecyclerView.ViewHolder{
+        private final TextView tvSeller;
+        private final TextView tvAddress;
+        private final TextView tvTimestamp;
+        private final TextView tvTotalCost;
+        private final ImageButton imgBtnUpdate;
+        private final ImageButton imgBtnDelete;
+
 
         public InvoiceViewHolder(View itemView){
             super(itemView);
@@ -75,7 +78,8 @@ public class InvoiceAdapter extends RecyclerView.Adapter<InvoiceAdapter.InvoiceV
             tvAddress = itemView.findViewById(R.id.tv_address);
             tvTimestamp = itemView.findViewById(R.id.tv_timestamp);
             tvTotalCost = itemView.findViewById(R.id.tv_total_cost);
-            btnUpdateItemInvoice = itemView.findViewById(R.id.btn_update_item_invoice);
+            imgBtnUpdate = itemView.findViewById(R.id.btn_update_item_invoice);
+            imgBtnDelete = itemView.findViewById(R.id.btn_delete_item_invoice);
 
         }
     }

@@ -35,19 +35,26 @@ import androidx.fragment.app.Fragment;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.android.volley.Response;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.dl.smartshouhi.R;
 import com.dl.smartshouhi.activity.HomeActivity;
 import com.dl.smartshouhi.activity.SignInActivity;
+import com.dl.smartshouhi.api.UserDbApi;
+import com.dl.smartshouhi.model.UserModel;
 import com.google.android.material.navigation.NavigationView;
 import com.google.gson.Gson;
 
+import java.io.IOException;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Map;
+
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 import static com.dl.smartshouhi.constaint.Constant.DOB_KEY;
 import static com.dl.smartshouhi.constaint.Constant.EMAIL_KEY;
@@ -56,6 +63,7 @@ import static com.dl.smartshouhi.constaint.Constant.ID_KEY;
 import static com.dl.smartshouhi.constaint.Constant.ISADMIN_KEY;
 import static com.dl.smartshouhi.constaint.Constant.PASSWORD_KEY;
 import static com.dl.smartshouhi.constaint.Constant.PHONE_KEY;
+import static com.dl.smartshouhi.constaint.Constant.RESULT_GET_API;
 import static com.dl.smartshouhi.constaint.Constant.SHARED_PREFS;
 import static com.dl.smartshouhi.constaint.Constant.URL_CHANGE_PASSWORD;
 import static com.dl.smartshouhi.constaint.Constant.URL_CHANGE_PROFILE;
@@ -105,7 +113,6 @@ public class PersonFragment extends Fragment implements NavigationView.OnNavigat
     private Button btnCancelChange;
     private Button btnYesChange;
 
-    private Uri uri;
     private HomeActivity homeActivity;
 
     private String email, fullName, userName, phone, dob;
@@ -143,27 +150,28 @@ public class PersonFragment extends Fragment implements NavigationView.OnNavigat
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
-        if (id == R.id.nav_notice) {
+        if (id != R.id.nav_notice) {
+            if (id == R.id.nav_sign_out) {
 
-        } else if (id == R.id.nav_sign_out) {
+                SharedPreferences.Editor editor = sharedpreferences.edit();
 
-            SharedPreferences.Editor editor = sharedpreferences.edit();
+                editor.remove(EMAIL_KEY);
+                editor.remove(USERNAME_KEY);
+                editor.remove(FULLNAME_KEY);
+                editor.remove(PHONE_KEY);
+                editor.remove(DOB_KEY);
+                editor.remove(ISADMIN_KEY);
+                editor.remove(ID_KEY);
+                editor.remove(PASSWORD_KEY);
+                editor.remove(RESULT_GET_API);
+                editor.clear();
+                editor.commit();
 
-            editor.remove(EMAIL_KEY);
-            editor.remove(USERNAME_KEY);
-            editor.remove(FULLNAME_KEY);
-            editor.remove(PHONE_KEY);
-            editor.remove(DOB_KEY);
-            editor.remove(ISADMIN_KEY);
-            editor.remove(ID_KEY);
-            editor.remove(PASSWORD_KEY);
-            editor.clear();
-            editor.commit();
 
-
-            Intent intent = new Intent(getActivity(), SignInActivity.class);
-            startActivity(intent);
-            getActivity().finish();
+                Intent intent = new Intent(getActivity(), SignInActivity.class);
+                startActivity(intent);
+                getActivity().finish();
+            }
         }
 
         drawerLayout.closeDrawer(GravityCompat.END);
@@ -240,12 +248,7 @@ public class PersonFragment extends Fragment implements NavigationView.OnNavigat
         /*E- Ket thuc khoi tao UI trong nav drawable */
 
         requestQueue = Volley.newRequestQueue(getActivity());
-    }
 
-    private void setUserInformation(){
-
-        // getting data from shared prefs and
-        // storing it in our string variable.
         sharedpreferences = this.getActivity().getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
         email = sharedpreferences.getString(EMAIL_KEY, "");
         fullName = sharedpreferences.getString(FULLNAME_KEY, "");
@@ -265,37 +268,95 @@ public class PersonFragment extends Fragment implements NavigationView.OnNavigat
         tvUserName.setText(userName);
         tvDob.setText(dob);
         tvPhone.setText(phone);
+    }
+
+    private void setUserInformation(){
 
 
 
-//        tvFullName.setText(user.getDisplayName());
-//        tvEmail.setText(user.getEmail());
-//        tvEmailHeader.setText(user.getEmail());
-//        tvUsernameHeader.setText(user.getDisplayName());
+        // getting data from shared prefs and
+        // storing it in our string variable.
+        sharedpreferences = this.getActivity().getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
+        email = sharedpreferences.getString(EMAIL_KEY, "");
 
-//        uri = user.getPhotoUrl();
+        UserDbApi.databaseApi.getUserByEmail(email).enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                try {
+                    String result = response.body().string();
+                    result = result.replace("\\", "");
+                    result = result.replace("\"{", "{");
+                    result = result.replace("}\"", "}");
+
+                    Gson gson = new Gson();
+                    String[] listResult = result.split("#");
+                    if(listResult[0].equals("200")) {
+                        UserModel userModel = gson.fromJson(listResult[1], UserModel.class);
+                        SharedPreferences.Editor editor = sharedpreferences.edit();
+
+                        // below two lines will put values for
+                        // email and password in shared preferences.
+                        editor.putString(EMAIL_KEY, userModel.getEmail());
+                        editor.putString(USERNAME_KEY, userModel.getUserName());
+                        editor.putString(FULLNAME_KEY, userModel.getFullName());
+                        editor.putInt(ID_KEY, userModel.getId());
+                        editor.putString(PHONE_KEY, userModel.getPhone());
+                        editor.putBoolean(ISADMIN_KEY, userModel.isAdmin());
+                        editor.putString(DOB_KEY, userModel.getDob());
+
+
+                        // to save our data with key and value.
+                        editor.apply();
+                        tvFullName.setText(userModel.getFullName());
+                        tvEmail.setText(email);
+                        tvEmailHeader.setText(email);
+                        tvUsernameHeader.setText(userModel.getUserName());
+                        tvUserName.setText(userModel.getUserName());
+                        tvDob.setText(userModel.getDob());
+                        tvPhone.setText(userModel.getPhone());
+
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+            }
+        });
+//        fullName = sharedpreferences.getString(FULLNAME_KEY, "");
+//        userName = sharedpreferences.getString(USERNAME_KEY, "");
+//        phone = sharedpreferences.getString(PHONE_KEY, "");
+//        dob = sharedpreferences.getString(DOB_KEY, "");
 //
-//        Glide.with(getActivity()).load(user.getPhotoUrl()).error(R.drawable.ic_avatar_default).into(imgAvatar);
-//        Glide.with(getActivity()).load(user.getPhotoUrl()).error(R.drawable.ic_avatar_default).into(imgAvatarHeader);
+//
+//        if(email == null){
+//            return;
+//        }
+//
+//        tvFullName.setText(fullName);
+//        tvEmail.setText(email);
+//        tvEmailHeader.setText(email);
+//        tvUsernameHeader.setText(userName);
+//        tvUserName.setText(userName);
+//        tvDob.setText(dob);
+//        tvPhone.setText(phone);
+
     }
 
     private void initListener() {
 
         btnUpdateProfile.setOnClickListener(v -> {
-//            onClickUpdateProfile();
             showDialogUpdate();
         });
 
-        btnChangePassword.setOnClickListener(v -> {
-            showDialogChangePassword();
-        });
+        btnChangePassword.setOnClickListener(v -> showDialogChangePassword());
 
-        imgButtonCalendar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                displayCalendar();
-            }
-        });
+        imgButtonCalendar.setOnClickListener(v -> displayCalendar());
     }
 
     private void onClickRequestPermission() {
@@ -322,82 +383,61 @@ public class PersonFragment extends Fragment implements NavigationView.OnNavigat
         String strUsername = edtUserNameUpdate.getText().toString().trim();
         String strPhone = edtPhoneUpdate.getText().toString().trim();
         String strDob = edtDob.getText().toString().trim();
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, URL_CHANGE_PROFILE, response -> {
 
-            response = response.replace("\\", "");
-            response = response.replace("\"{", "{");
-            response = response.replace("}\"", "}");
-            response = response.substring(1, response.length()-1);
-            Gson gson = new Gson();
-            String[] listResult = response.split("#");
-            if(listResult[0].equals("200")){
-                SharedPreferences.Editor editor = sharedpreferences.edit();
-
-                // below two lines will put values for
-                // email and password in shared preferences.
-                editor.putString(FULLNAME_KEY, strFullName);
-                editor.putString(USERNAME_KEY, strUsername);
-                editor.putString(PHONE_KEY, strPhone);
-                editor.putString(DOB_KEY, strDob);
-
-                // to save our data with key and value.
-                editor.apply();
-
-                Toast.makeText(getActivity(), listResult[1], Toast.LENGTH_SHORT).show();
-                setUserInformation();
-                dialogUpdate.dismiss();
-
-            }else {
-                dialogUpdate.dismiss();
-                Toast.makeText(getActivity(), listResult[1], Toast.LENGTH_SHORT).show();
-            }
-
-        }, error -> {
-            dialogUpdate.dismiss();
-            Toast.makeText(getActivity(), "Update Error", Toast.LENGTH_SHORT).show();
-        }){
+        UserDbApi.databaseApi.updateProfile(email, strUsername, strFullName, phone, dob).enqueue(new Callback<ResponseBody>() {
             @Override
-            protected Map<String, String> getParams() {
-                Map<String,String> params = new HashMap<>();
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
 
-                params.put("email", email);
-                params.put("userName",strUsername);
-                params.put("fullName",strFullName);
-                params.put("phone",strPhone);
-                params.put("dob",strDob);
-                return params;
+                try {
+                    String result = response.body().string();
+                    result = result.replace("\\", "");
+                    result = result.replace("\"{", "{");
+                    result = result.replace("}\"", "}");
+                    result = result.substring(1, result.length()-1);
+
+                    String[] listResult = result.split("#");
+                    if(listResult[0].equals("200")){
+                        SharedPreferences.Editor editor = sharedpreferences.edit();
+
+                        // below two lines will put values for
+                        // email and password in shared preferences.
+                        editor.putString(FULLNAME_KEY, strFullName);
+                        editor.putString(USERNAME_KEY, strUsername);
+                        editor.putString(PHONE_KEY, strPhone);
+                        editor.putString(DOB_KEY, strDob);
+
+                        // to save our data with key and value.
+                        editor.apply();
+
+                        Toast.makeText(getActivity(), listResult[1], Toast.LENGTH_SHORT).show();
+                        setUserInformation();
+                        dialogUpdate.dismiss();
+
+                    }else {
+                        dialogUpdate.dismiss();
+                        Toast.makeText(getActivity(), listResult[1], Toast.LENGTH_SHORT).show();
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+
             }
-        };
 
-        requestQueue.add(stringRequest);
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                dialogUpdate.dismiss();
+                Toast.makeText(getActivity(), "Cập nhật không thành công", Toast.LENGTH_SHORT).show();
+                dialogUpdate.dismiss();
+            }
+        });
 
 
-
-//         UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
-//                 .setDisplayName(strFullName)
-//                 .setPhotoUri(uri)
-//                 .build();
-
-//         user.updateProfile(profileUpdates)
-//                 .addOnCompleteListener(task -> {
-//                     progressDialog.dismiss();
-//                     if (task.isSuccessful()) {
-//                         Toast.makeText(getActivity(), "Update Profile Success", Toast.LENGTH_LONG).show();
-// //                        homeActivity.showUserInformation();
-//                         setUserInformation();
-
-//                         dialogUpdate.dismiss();
-//                     }
-//                 });
     }
 
 
     public void setBitmapImageView(Bitmap bitmapImageView){
         imgAvatarUpdate.setImageBitmap(bitmapImageView);
-    }
-
-    public void setUri(Uri mUri) {
-        this.uri = mUri;
     }
 
     private void showDialogUpdate(){
@@ -443,48 +483,38 @@ public class PersonFragment extends Fragment implements NavigationView.OnNavigat
         String strConfirmPassword = edtConfirmPassword.getText().toString().trim();
 
         if(strNewPassword.equals(strConfirmPassword)){
-            StringRequest stringRequest = new StringRequest(Request.Method.POST, URL_CHANGE_PASSWORD, new Response.Listener<String>() {
+
+            UserDbApi.databaseApi.updatePassword(email, strOldPassword, strNewPassword).enqueue(new Callback<ResponseBody>() {
                 @Override
-                public void onResponse(String response) {
+                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                    String result = null;
+                    try {
+                        result = response.body().string();
+                        result = result.replace("\\", "");
+                        result = result.replace("\"{", "{");
+                        result = result.replace("}\"", "}");
+                        String[] listResult = result.split("#");
+                        if(listResult[0].equals("200")){
+                            SharedPreferences.Editor editor = sharedpreferences.edit();
+                            editor.putString(PASSWORD_KEY, strNewPassword);
+                            editor.apply();
 
-                    response = response.replace("\\", "");
-                    response = response.replace("\"{", "{");
-                    response = response.replace("}\"", "}");
-                    response = response.substring(1, response.length()-1);
-                    Gson gson = new Gson();
-                    String[] listResult = response.split("#");
-                    if(listResult[0].equals("200")){
-                        SharedPreferences.Editor editor = sharedpreferences.edit();
-
-                        // below two lines will put values for
-                        // email and password in shared preferences.
-                        editor.putString(PASSWORD_KEY, strNewPassword);
-                        // to save our data with key and value.
-                        editor.apply();
-
+                        }
+                        Toast.makeText(getActivity(), listResult[1], Toast.LENGTH_SHORT).show();
+                        dialogChangePassword.dismiss();
+                    } catch (IOException e) {
+                        e.printStackTrace();
                     }
-                    Toast.makeText(getActivity(), listResult[1], Toast.LENGTH_SHORT).show();
-                    dialogChangePassword.dismiss();
-
                 }
-            }, error -> {
-                Toast.makeText(getActivity(), "Update Password Error", Toast.LENGTH_SHORT).show();
-                dialogChangePassword.dismiss();
-            }){
+
                 @Override
-                protected Map<String, String> getParams() {
-                    Map<String,String> params = new HashMap<>();
-
-                    params.put("email", email);
-                    params.put("pass_word_old",strOldPassword);
-                    params.put("pass_word_new",strNewPassword);
-                    return params;
+                public void onFailure(Call<ResponseBody> call, Throwable t) {
+                    Toast.makeText(getActivity(), "Thay đổi mật khẩu không thành công", Toast.LENGTH_SHORT).show();
+                    dialogChangePassword.dismiss();
                 }
-            };
-
-            requestQueue.add(stringRequest);
+            });
         }else {
-            Toast.makeText(getActivity(), "Confirm Password miss matching", Toast.LENGTH_LONG).show();
+            Toast.makeText(getActivity(), "Mật khẩu xác nhận sai", Toast.LENGTH_LONG).show();
         }
 
     }
@@ -524,5 +554,6 @@ public class PersonFragment extends Fragment implements NavigationView.OnNavigat
         alertDialog.show();
     }
 
-
+    public void setUri(Uri uri) {
+    }
 }

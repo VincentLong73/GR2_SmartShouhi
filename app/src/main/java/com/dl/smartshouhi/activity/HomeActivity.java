@@ -9,7 +9,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.Menu;
-import android.widget.TextView;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -48,13 +47,9 @@ public class HomeActivity extends AppCompatActivity {
     private static final String FRAGMENT_HOME_ADMIN = "HomeAdminFragment";
 
     private String currentFragment;
-    private SharedPreferences sharedpreferences;
 
 
     private BottomNavigationView bottomNavigationView;
-    private TextView tvTitleToolbar;
-    private Menu mOptionsMenu;
-    private Toolbar toolbar;
     private Boolean isAdmin = false;
 
 
@@ -73,7 +68,6 @@ public class HomeActivity extends AppCompatActivity {
                     }else if(getCurrentFragment().equals(FRAGMENT_HOME) && checkVisibleFragment(FRAGMENT_HOME) ){
                         homeFragment.setUri(uri);
                     }else if(getCurrentFragment().equals(FRAGMENT_PERSON) && checkVisibleFragment(FRAGMENT_PERSON) ){
-//                        myProfileFragment.setUri(uri);
                         personFragment.setUri(uri);
                     }
 
@@ -85,7 +79,6 @@ public class HomeActivity extends AppCompatActivity {
                         }else if(getCurrentFragment().equals(FRAGMENT_HOME) && checkVisibleFragment(FRAGMENT_HOME) ){
                             homeFragment.setBitmapImageView(bitmap);
                         }else if(getCurrentFragment().equals(FRAGMENT_PERSON) && checkVisibleFragment(FRAGMENT_PERSON) ){
-//                            myProfileFragment.setBitmapImageView(bitmap);
                             personFragment.setBitmapImageView(bitmap);
                         }
 
@@ -103,8 +96,6 @@ public class HomeActivity extends AppCompatActivity {
 
 
         initUI();
-//        Toolbar toolbar = findViewById(R.id.toolbar);
-        //setSupportActionBar(toolbar);
         setTitleToolbar();
         selectItemInBottomNavigation();
     }
@@ -112,23 +103,11 @@ public class HomeActivity extends AppCompatActivity {
 
     private void initUI() {
 
-        toolbar = findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         bottomNavigationView = findViewById(R.id.bottom_nav);
-        //setSupportActionBar(toolbar);
-        //((AppCompatActivity) HomeActivity.this).setSupportActionBar(toolbar);
 
-        //toolbar =(Toolbar) findViewById(R.id.toolbar);
-//        tvTitleToolbar = (TextView) toolbar.findViewById(R.id.toolbar_title_home);
-//        tvTitleToolbar.setText("hihi");
-
-//        getSupportActionBar().setDisplayShowTitleEnabled(false);
-        sharedpreferences = getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
-
-        // in shared prefs inside het string method
-        // we are passing key value as EMAIL_KEY and
-        // default value is
-        // set to null if not present.
+        SharedPreferences sharedpreferences = getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
 
         isAdmin = sharedpreferences.getBoolean(ISADMIN_KEY, false);
         if(isAdmin) {
@@ -156,7 +135,7 @@ public class HomeActivity extends AppCompatActivity {
         }
 
         if(getSupportActionBar() != null){
-//            tvTitleToolbar.setText(title);
+
             getSupportActionBar().setTitle(title);
         }
     }
@@ -172,7 +151,6 @@ public class HomeActivity extends AppCompatActivity {
                     }
                     break;
                 case R.id.action_person:
-//                    replaceFragment(myProfileFragment, FRAGMENT_PERSON);
                     replaceFragment(personFragment, FRAGMENT_PERSON);
                     break;
                 case R.id.action_info:
@@ -182,22 +160,6 @@ public class HomeActivity extends AppCompatActivity {
             return true;
         });
 
-//        bottomNavigationView.setOnItemReselectedListener(new NavigationBarView.OnItemReselectedListener() {
-//            @Override
-//            public void onNavigationItemReselected( MenuItem item) {
-//                switch (item.getItemId()){
-//                    case R.id.action_home:
-//                        viewPager.setCurrentItem(0);
-//                        break;
-//                    case R.id.action_person:
-//                        viewPager.setCurrentItem(1);
-//                        break;
-//                    case R.id.action_info:
-//                        viewPager.setCurrentItem(2);
-//                        break;
-//                }
-//            }
-//        });
     }
 
     private void replaceFragment(Fragment fragment, String nameFragment){
@@ -206,7 +168,6 @@ public class HomeActivity extends AppCompatActivity {
         transaction.replace(R.id.fragment_home, fragment, nameFragment);
         setCurrentFragment(nameFragment);
         setTitleToolbar();
-//        setOptionMenuRight();
         transaction.commit();
     }
 
@@ -242,20 +203,6 @@ public class HomeActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_notice, menu);
-        mOptionsMenu = menu;
         return true;
     }
-
-
-//    private void setOptionMenuRight(){
-//
-//        if(mOptionsMenu != null){
-//            mOptionsMenu.clear();
-//            if(currentFragment.equals(FRAGMENT_PERSON)){
-//                getMenuInflater().inflate(R.menu.menu_in_person, mOptionsMenu);
-//            }else{
-//                getMenuInflater().inflate(R.menu.menu_notice, mOptionsMenu);
-//            }
-//        }
-//    }
 }

@@ -29,10 +29,10 @@ import java.util.List;
 public class BarChartFragment extends Fragment {
 
     private static final String SET_LABEL = "VND";
-    private String[] xLabels;
-    private int maxXAxis;
-    private Float[][] totalCostOfListInvoice;
-    private int yearSelected;
+    private final String[] xLabels;
+    private final int maxXAxis;
+    private final Float[][] totalCostOfListInvoice;
+    private final int yearSelected;
 
 
     public BarChartFragment(String[] xLabels, int maxXAxis, Float[][] totalCostOfListInvoice, int yearSelected) {
@@ -44,7 +44,6 @@ public class BarChartFragment extends Fragment {
 
     private View mView;
     private ViewPager2 viewPager;
-    private BarChartAdapter barChartAdapter;
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Nullable
@@ -76,8 +75,7 @@ public class BarChartFragment extends Fragment {
             }
             position = weekOfYear -1;
         }else{
-            int year = yearSelected - 2020;
-            position = year;
+            position = yearSelected - 2020;
         }
         viewPager.setCurrentItem(position);
     }
@@ -88,13 +86,13 @@ public class BarChartFragment extends Fragment {
 
         List<BarData> barDataList = new ArrayList<>();
 
-        for (int i = 0; i < totalCostOfListInvoice.length; i++) {
+        for (Float[] floats : totalCostOfListInvoice) {
 
             ArrayList<BarEntry> values = new ArrayList<>();
             for (int j = 0; j < maxXAxis; j++) {
                 float y = 0f;
-                if (totalCostOfListInvoice[i][j] > 0f) {
-                    y += totalCostOfListInvoice[i][j];
+                if (floats[j] > 0f) {
+                    y += floats[j];
                 }
                 values.add(new BarEntry((float) j, y));
             }
@@ -123,7 +121,7 @@ public class BarChartFragment extends Fragment {
         });
         viewPager.setPageTransformer(compositePageTransformer);
 
-        barChartAdapter = new BarChartAdapter(generateData(), getContext(), xLabels, yearSelected);
+        BarChartAdapter barChartAdapter = new BarChartAdapter(generateData(), xLabels, yearSelected);
         viewPager.setAdapter(barChartAdapter);
     }
 

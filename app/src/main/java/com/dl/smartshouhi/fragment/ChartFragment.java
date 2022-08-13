@@ -21,13 +21,14 @@ import androidx.fragment.app.FragmentTransaction;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.android.volley.Response;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.dl.smartshouhi.R;
+import com.dl.smartshouhi.api.InvoiceDbApi;
 import com.dl.smartshouhi.model.Invoice;
 import com.google.gson.Gson;
 
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -36,6 +37,11 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 import static com.dl.smartshouhi.constaint.Constant.ID_KEY;
 import static com.dl.smartshouhi.constaint.Constant.SHARED_PREFS;
@@ -168,69 +174,66 @@ public class ChartFragment extends Fragment {
         requestQueue = Volley.newRequestQueue(getActivity());
         initTotalCostOfListInvoiceWeek();
 
-        sharedpreferences = this.getActivity().getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
 
+
+        sharedpreferences = this.getActivity().getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
         // getting data from shared prefs and
         // storing it in our string variable.
         userId = sharedpreferences.getInt(ID_KEY, -1);
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, URL_GET_INVOICE_BY_USER_ID+userId, new Response.Listener<String>() {
+        InvoiceDbApi.databaseApi.getListInvoice(userId).enqueue(new Callback<ResponseBody>() {
             @Override
-            public void onResponse(String response) {
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                try {
+                    String result = response.body().string();
+                    result = result.replace("\\", "");
+                    result = result.replace("\"{", "{");
+                    result = result.replace("}\"", "}");
+                    result = result.substring(1, result.length() - 1);
+                    Gson gson = new Gson();
 
-                response = response.replace("\\", "");
-                response = response.replace("\"{", "{");
-                response = response.replace("}\"", "}");
-                response = response.substring(1, response.length() - 1);
-                Gson gson = new Gson();
+                    String[] listResult = result.split("#");
 
-                String[] listResult = response.split("#");;
+                    if(listResult[0].equals("200")){
+                        invoiceList = Arrays.asList(gson.fromJson(listResult[1], Invoice[].class));
+                        for(Invoice invoice : invoiceList) {
+                            Calendar calendar = Calendar.getInstance();
+                            SimpleDateFormat dateFormat1 = new SimpleDateFormat("yyyy-MM-dd");
+                            SimpleDateFormat dateFormat2 = new SimpleDateFormat("dd/MM/yyyy");
+                            try {
+                                String strDate = dateFormat2.format(dateFormat1.parse(invoice.getTimestamp()));
 
-                if(listResult[0].equals("200")){
-                    invoiceList = Arrays.asList(gson.fromJson(listResult[1], Invoice[].class));
-                    for(Invoice invoice : invoiceList) {
-                        Calendar calendar = Calendar.getInstance();
-//                        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-                        SimpleDateFormat dateFormat1 = new SimpleDateFormat("yyyy-MM-dd");
-                        SimpleDateFormat dateFormat2 = new SimpleDateFormat("dd/MM/yyyy");
-                        try {
-                            String strDate = dateFormat2.format(dateFormat1.parse(invoice.getTimestamp()));
-//                            calendar.setTime(dateFormat.parse(invoice.getTimestamp()));
-                            calendar.setTime(dateFormat2.parse(strDate));
-                            if (calendar.get(Calendar.YEAR) == yearSelected) {
-                                int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
-                                int weekOfYear = calendar.get(Calendar.WEEK_OF_YEAR);
-                                if (weekOfYear == 1) {
-                                    weekOfYear = 52;
-                                } else {
-                                    weekOfYear -= 1;
+                                calendar.setTime(dateFormat2.parse(strDate));
+                                if (calendar.get(Calendar.YEAR) == yearSelected) {
+                                    int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
+                                    int weekOfYear = calendar.get(Calendar.WEEK_OF_YEAR);
+                                    if (weekOfYear == 1) {
+                                        weekOfYear = 52;
+                                    } else {
+                                        weekOfYear -= 1;
+                                    }
+                                    totalCostOfListInvoiceWeek[weekOfYear - 1][dayOfWeek - 1] += invoice.getTotalCost();
                                 }
-                                totalCostOfListInvoiceWeek[weekOfYear - 1][dayOfWeek - 1] += invoice.getTotalCost();
+                            }catch (ParseException e) {
+                                e.printStackTrace();
                             }
-                        }catch (ParseException e) {
-                            e.printStackTrace();
                         }
+                        replaceFragmentChart(totalCostOfListInvoiceWeek,DAYS,MAX_X_VALUE);
+
+                    }else {
+                        // If sign in fails, display a message to the user.
+                        Toast.makeText(getActivity(), listResult[1], Toast.LENGTH_SHORT).show();
                     }
-
-                    replaceFragmentChart(totalCostOfListInvoiceWeek,DAYS,MAX_X_VALUE);
-
-                }else {
-                    // If sign in fails, display a message to the user.
-                    Toast.makeText(getActivity(), listResult[1], Toast.LENGTH_SHORT).show();
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
 
             }
-        }, error -> {
 
-        }){
             @Override
-            protected Map<String, String> getParams() {
-                Map<String,String> params = new HashMap<>();
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
 
-                return params;
             }
-        };
-
-        requestQueue.add(stringRequest);
+        });
 
     }
     private void processingDataYear() {
@@ -246,60 +249,58 @@ public class ChartFragment extends Fragment {
         // getting data from shared prefs and
         // storing it in our string variable.
         userId = sharedpreferences.getInt(ID_KEY, -1);
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, URL_GET_INVOICE_BY_USER_ID_YEAR+"id="+userId+"&"+"year="+yearSelected, new Response.Listener<String>() {
+
+        InvoiceDbApi.databaseApi.getListInvoiceYear(userId, yearSelected).enqueue(new Callback<ResponseBody>() {
             @Override
-            public void onResponse(String response) {
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                try {
+                    String result = response.body().string();
+                    result = result.replace("\\", "");
+                    result = result.replace("\"{", "{");
+                    result = result.replace("}\"", "}");
+                    result = result.substring(1, result.length() - 1);
+                    Gson gson = new Gson();
 
-                response = response.replace("\\", "");
-                response = response.replace("\"{", "{");
-                response = response.replace("}\"", "}");
-                response = response.substring(1, response.length() - 1);
-                Gson gson = new Gson();
+                    String[] listResult = result.split("#");
 
-                String[] listResult = response.split("#");
+                    if(listResult[0].equals("200")){
+                        invoiceList = Arrays.asList(gson.fromJson(listResult[1], Invoice[].class));
 
-                if(listResult[0].equals("200")){
-                    invoiceList = Arrays.asList(gson.fromJson(listResult[1], Invoice[].class));
-
-                    for(Invoice invoice : invoiceList) {
-                        Calendar calendar = Calendar.getInstance();
+                        for(Invoice invoice : invoiceList) {
+                            Calendar calendar = Calendar.getInstance();
 //                        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-                        SimpleDateFormat dateFormat1 = new SimpleDateFormat("yyyy-MM-dd");
-                        SimpleDateFormat dateFormat2 = new SimpleDateFormat("dd/MM/yyyy");
-                        try {
-                            String strDate = dateFormat2.format(dateFormat1.parse(invoice.getTimestamp()));
+                            SimpleDateFormat dateFormat1 = new SimpleDateFormat("yyyy-MM-dd");
+                            SimpleDateFormat dateFormat2 = new SimpleDateFormat("dd/MM/yyyy");
+                            try {
+                                String strDate = dateFormat2.format(dateFormat1.parse(invoice.getTimestamp()));
 //                            calendar.setTime(dateFormat.parse(invoice.getTimestamp()));
-                            calendar.setTime(dateFormat2.parse(strDate));
+                                calendar.setTime(dateFormat2.parse(strDate));
 
-                            int month = calendar.get(Calendar.MONTH);
-                            int year = calendar.get(Calendar.YEAR);
-                            float total = invoice.getTotalCost();
-                            totalCostOfListInvoiceYear[year - 2020][month] += invoice.getTotalCost();
+                                int month = calendar.get(Calendar.MONTH);
+                                int year = calendar.get(Calendar.YEAR);
+                                totalCostOfListInvoiceYear[year - 2020][month] += invoice.getTotalCost();
 
-                        } catch (ParseException e) {
-                            e.printStackTrace();
+                            } catch (ParseException e) {
+                                e.printStackTrace();
+                            }
                         }
+
+                        replaceFragmentChart(totalCostOfListInvoiceYear,MONTHS,MAX_X_VALUE_MONTH);
+
+                    }else {
+                        // If sign in fails, display a message to the user.
+                        Toast.makeText(getActivity(), "Error", Toast.LENGTH_SHORT).show();
                     }
-
-                    replaceFragmentChart(totalCostOfListInvoiceYear,MONTHS,MAX_X_VALUE_MONTH);
-
-                }else {
-                    // If sign in fails, display a message to the user.
-                    Toast.makeText(getActivity(), "Authentication failed.", Toast.LENGTH_SHORT).show();
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
-
             }
-        }, error -> {
 
-        }){
             @Override
-            protected Map<String, String> getParams() {
-                Map<String,String> params = new HashMap<>();
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
 
-                return params;
             }
-        };
-        requestQueue.add(stringRequest);
+        });
 
     }
 

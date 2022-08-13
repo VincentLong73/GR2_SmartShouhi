@@ -16,14 +16,8 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
-import com.android.volley.RequestQueue;
 import com.dl.smartshouhi.R;
-import com.dl.smartshouhi.activity.HomeActivity;
 
-import static com.dl.smartshouhi.constaint.Constant.DOB_KEY;
-import static com.dl.smartshouhi.constaint.Constant.EMAIL_KEY;
-import static com.dl.smartshouhi.constaint.Constant.FULLNAME_KEY;
-import static com.dl.smartshouhi.constaint.Constant.PHONE_KEY;
 import static com.dl.smartshouhi.constaint.Constant.SHARED_PREFS;
 import static com.dl.smartshouhi.constaint.Constant.USERNAME_KEY;
 
@@ -36,15 +30,8 @@ public class HomeFragment extends Fragment {
     private ImageView imgAddInvoice;
     private ImageView imgChart;
     private ImageView imgHistory;
-    private ImageView imgFavorite;
-
-    private SharedPreferences sharedpreferences;
-    private RequestQueue requestQueue;
-    private String emailShared, userNameShared, fullNameShared;
-    private String email, fullName, userName, phone, dob;
 
     private final InvoiceInformationFragment invoiceInformationFragment;
-    private HomeActivity homeActivity;
 
 
     public HomeFragment(InvoiceInformationFragment invoiceInformationFragment) {
@@ -65,31 +52,19 @@ public class HomeFragment extends Fragment {
     }
 
     private void initUI() {
-        homeActivity = (HomeActivity) getActivity();
-
         imgAvatar = mView.findViewById(R.id.img_avatar_dashboard);
         tvUsername = mView.findViewById(R.id.tv_username_dashboard);
 
         imgAddInvoice = mView.findViewById(R.id.img_add_an_invoice);
         imgChart = mView.findViewById(R.id.img_chart);
         imgHistory = mView.findViewById(R.id.img_history);
-//        imgFavorite = mView.findViewById(R.id.img_favorite);
-
 
     }
 
     private void setUserInformation(){
 
-        sharedpreferences = this.getActivity().getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
-
-        // getting data from shared prefs and
-        // storing it in our string variable.
-        email = sharedpreferences.getString(EMAIL_KEY, "");
-        fullName = sharedpreferences.getString(FULLNAME_KEY, "");
-        userName = sharedpreferences.getString(USERNAME_KEY, "");
-        phone = sharedpreferences.getString(PHONE_KEY, "");
-        dob = sharedpreferences.getString(DOB_KEY, "");
-
+        SharedPreferences sharedpreferences = this.getActivity().getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
+        String userName = sharedpreferences.getString(USERNAME_KEY, "");
         tvUsername.setText(userName.trim());
     }
 
@@ -118,9 +93,6 @@ public class HomeFragment extends Fragment {
         replaceFragment(new HistoryFragment(), "HistoryFragment");
     }
 
-    private void onClickShowFavorite() {
-    }
-
     private void replaceFragment(Fragment fragment, String nameFragment){
 
         FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
@@ -132,7 +104,7 @@ public class HomeFragment extends Fragment {
         imgAvatar.setImageBitmap(bitmapImageView);
     }
 
-    public void setUri(Uri mUri) {
-    }
 
+    public void setUri(Uri uri) {
+    }
 }

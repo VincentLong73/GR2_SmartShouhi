@@ -1,6 +1,5 @@
 package com.dl.smartshouhi.adapter;
 
-import android.content.Context;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,22 +21,18 @@ import java.util.Calendar;
 import java.util.List;
 
 
-
-
 public class BarChartAdapter extends RecyclerView.Adapter<BarChartAdapter.BarChartViewHolder> {
 
 
 
     private final List<BarData> barDataList;
-    private String[] xLabels;
-    private Context context;
-    private int yearSelected;
+    private final String[] xLabels;
+    private final int yearSelected;
 
 
-    public BarChartAdapter(List<BarData> barDataList, Context context, String[] xLabels, int yearSelected) {
+    public BarChartAdapter(List<BarData> barDataList, String[] xLabels, int yearSelected) {
         this.barDataList = barDataList;
         this.xLabels = xLabels;
-        this.context = context;
         this.yearSelected = yearSelected;
     }
 
@@ -54,7 +49,7 @@ public class BarChartAdapter extends RecyclerView.Adapter<BarChartAdapter.BarCha
 
 
         if(xLabels.length == 7){
-            String tvTime = "";
+            String tvTime;
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
             Calendar dateSunday = Calendar.getInstance();
 

@@ -1,6 +1,5 @@
 package com.dl.smartshouhi.api;
 
-import com.dl.smartshouhi.model.InvoiceItemModel;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
@@ -9,14 +8,19 @@ import java.util.concurrent.TimeUnit;
 
 import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.converter.scalars.ScalarsConverterFactory;
+import retrofit2.http.Field;
+import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.Headers;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.Part;
+import retrofit2.http.Query;
 
 public interface ApiService {
 
@@ -31,25 +35,15 @@ public interface ApiService {
             .build();
 
     ApiService apiService = new Retrofit.Builder()
-//            .baseUrl("http://10.0.3.2:5000/")
-            .baseUrl("http://7d88-35-245-95-19.ngrok.io/")
+            .baseUrl("http://e00e-34-124-133-84.ngrok.io/")
             .addConverterFactory(GsonConverterFactory.create(gson))
             .client(okHttpClient)
             .build()
             .create(ApiService.class);
 
     @Headers({"Accept: application/json"})
-    @GET("api/get-in4")
-    Call<InvoiceItemModel> getInformationInvoice();
-
-//    @Multipart
-//    @POST("api/send-image")
-//    Call<Image> getInformationInvoice1(@Part MultipartBody.Part img);
-
-    @Headers({"Accept: application/json"})
     @Multipart
     @POST("api/get-in4")
-//    Call<InvoiceItemModel> getInformationInvoice2(@Part MultipartBody.Part img);
     Call<JsonObject> getInformationInvoice2(@Part MultipartBody.Part img);
 
 }

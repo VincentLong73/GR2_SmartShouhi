@@ -10,33 +10,29 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.dl.smartshouhi.R;
+import com.dl.smartshouhi.api.LoginDbApi;
 import com.dl.smartshouhi.model.UserModel;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.gson.Gson;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.io.IOException;
+
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 import static com.dl.smartshouhi.constaint.Constant.DOB_KEY;
 import static com.dl.smartshouhi.constaint.Constant.EMAIL_KEY;
 import static com.dl.smartshouhi.constaint.Constant.FULLNAME_KEY;
 import static com.dl.smartshouhi.constaint.Constant.ID_KEY;
 import static com.dl.smartshouhi.constaint.Constant.ISADMIN_KEY;
-import static com.dl.smartshouhi.constaint.Constant.PASSWORD_KEY;
 import static com.dl.smartshouhi.constaint.Constant.PHONE_KEY;
 import static com.dl.smartshouhi.constaint.Constant.SHARED_PREFS;
-import static com.dl.smartshouhi.constaint.Constant.URL_LOGIN;
 import static com.dl.smartshouhi.constaint.Constant.USERNAME_KEY;
 
 public class SignInActivity extends AppCompatActivity {
@@ -51,7 +47,6 @@ public class SignInActivity extends AppCompatActivity {
 
     private SharedPreferences sharedpreferences;
     private RequestQueue requestQueue;
-    private String emailShared, passwordShared;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,12 +68,6 @@ public class SignInActivity extends AppCompatActivity {
 
         sharedpreferences = getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
 
-        // in shared prefs inside het string method
-        // we are passing key value as EMAIL_KEY and
-        // default value is
-        // set to null if not present.
-        emailShared = sharedpreferences.getString(EMAIL_KEY, null);
-        passwordShared = sharedpreferences.getString(PASSWORD_KEY, null);
         requestQueue = Volley.newRequestQueue(this);
     }
 
@@ -98,84 +87,68 @@ public class SignInActivity extends AppCompatActivity {
 
         String email = edtEmail.getText().toString().trim();
         String password = edtPassword.getText().toString().trim();
-        if(email == null || password == null || email.length() == 0 || password.length() == 0){
+        if(email.length() == 0 || password.length() == 0){
             mProgressDialog.dismiss();
-            Toast.makeText(SignInActivity.this, "Email and Password is not enterd",
+            Toast.makeText(SignInActivity.this, "Email hoặc Password chưa được nhập",
                     Toast.LENGTH_SHORT).show();
             return;
         }
 
-
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, URL_LOGIN, response -> {
-
-            response = response.replace("\\", "");
-            response = response.replace("\"{", "{");
-            response = response.replace("}\"", "}");
-            response = response.substring(1, response.length());
-            Gson gson = new Gson();
-            String[] listResult = response.split("#");
-            if(listResult[0].equals("200")){
-                UserModel userModel = gson.fromJson(listResult[1], UserModel.class);
-                SharedPreferences.Editor editor = sharedpreferences.edit();
-
-                // below two lines will put values for
-                // email and password in shared preferences.
-                editor.putString(EMAIL_KEY, userModel.getEmail());
-                editor.putString(USERNAME_KEY, userModel.getUserName());
-                editor.putString(FULLNAME_KEY, userModel.getFullName());
-                editor.putInt(ID_KEY, userModel.getId());
-                editor.putString(PHONE_KEY, userModel.getPhone());
-                editor.putBoolean(ISADMIN_KEY, userModel.isAdmin());
-                editor.putString(DOB_KEY, userModel.getDob());
-
-                //editor.putString(PASSWORD_KEY, passwordEdt.getText().toString());
-
-                // to save our data with key and value.
-                editor.apply();
-
-                mProgressDialog.dismiss();
-
-                Intent i;
-                i = new Intent(SignInActivity.this, HomeActivity.class);
-                startActivity(i);
-
-            }else {
-                mProgressDialog.dismiss();
-                Toast.makeText(SignInActivity.this, listResult[1], Toast.LENGTH_SHORT).show();
-            }
-
-        }, error -> {
-            Toast.makeText(SignInActivity.this, "Error", Toast.LENGTH_SHORT).show();
-        }){
+        LoginDbApi.databaseApi.login(email, password).enqueue(new Callback<ResponseBody>() {
             @Override
-            protected Map<String, String> getParams() {
-                Map<String,String> params = new HashMap<>();
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                try {
+                    String result = response.body().string();
+                    result = result.replace("\\", "");
+                    result = result.replace("\"{", "{");
+                    result = result.replace("}\"", "}");
 
-                params.put("email",email);
-                params.put("password",password);
-                return params;
+                    Gson gson = new Gson();
+                    String[] listResult = result.split("#");
+                    if(listResult[0].equals("200")){
+                        UserModel userModel = gson.fromJson(listResult[1], UserModel.class);
+                        SharedPreferences.Editor editor = sharedpreferences.edit();
+
+                        // below two lines will put values for
+                        // email and password in shared preferences.
+                        editor.putString(EMAIL_KEY, userModel.getEmail());
+                        editor.putString(USERNAME_KEY, userModel.getUserName());
+                        editor.putString(FULLNAME_KEY, userModel.getFullName());
+                        editor.putInt(ID_KEY, userModel.getId());
+                        editor.putString(PHONE_KEY, userModel.getPhone());
+                        editor.putBoolean(ISADMIN_KEY, userModel.isAdmin());
+                        editor.putString(DOB_KEY, userModel.getDob());
+
+
+                        // to save our data with key and value.
+                        editor.apply();
+
+                        mProgressDialog.dismiss();
+
+                        Intent i;
+                        i = new Intent(SignInActivity.this, HomeActivity.class);
+                        startActivity(i);
+
+                    }else {
+                        mProgressDialog.dismiss();
+                        Toast.makeText(SignInActivity.this, listResult[1], Toast.LENGTH_SHORT).show();
+                    }
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
             }
-        };
 
-        requestQueue.add(stringRequest);
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+            }
+        });
 
     }
 
     private void onClickForgotPassword() {
         mProgressDialog.show();
-//        FirebaseAuth auth = FirebaseAuth.getInstance();
-//
-////        String emailAddress = "longngodaugo1.1202@gmail.com";
-//        String emailAddress = auth.getCurrentUser().getEmail();
-
-//        auth.sendPasswordResetEmail(emailAddress)
-//                .addOnCompleteListener(task -> {
-//                    if(task.isSuccessful()) {
-//                        Toast.makeText(SignInActivity.this, "Email sent", Toast.LENGTH_LONG).show();
-//                    }else{
-//                        Toast.makeText(SignInActivity.this, "Email didn't send", Toast.LENGTH_LONG).show();
-//                    }
-//                    mProgressDialog.dismiss();
-//                });
     }
 }

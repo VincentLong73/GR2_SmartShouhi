@@ -13,13 +13,11 @@ import com.dl.smartshouhi.R;
 
 public class AboutUsFragment extends Fragment {
 
-    private View mView;
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
-        mView = inflater.inflate(R.layout.fragment_about, container, false);
+        View mView = inflater.inflate(R.layout.fragment_about, container, false);
 
         return mView;
     }

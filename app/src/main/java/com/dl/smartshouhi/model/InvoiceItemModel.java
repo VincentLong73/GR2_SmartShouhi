@@ -4,25 +4,25 @@ import java.util.List;
 
 public class InvoiceItemModel {
 
-    InvoiceTest invoice;
-    List<ItemTest> item;
+    InvoiceModel invoice;
+    List<ItemModel> item;
 
     public InvoiceItemModel() {
     }
 
-    public InvoiceTest getInvoice() {
+    public InvoiceModel getInvoice() {
         return invoice;
     }
 
-    public void setInvoice(InvoiceTest invoice) {
+    public void setInvoice(InvoiceModel invoice) {
         this.invoice = invoice;
     }
 
-    public List<ItemTest> getItem() {
+    public List<ItemModel> getItem() {
         return item;
     }
 
-    public void setItem(List<ItemTest> item) {
+    public void setItem(List<ItemModel> item) {
         this.item = item;
     }
 }

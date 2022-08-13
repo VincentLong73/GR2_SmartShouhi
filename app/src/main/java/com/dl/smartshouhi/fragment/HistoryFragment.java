@@ -26,27 +26,28 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.dl.smartshouhi.R;
 import com.dl.smartshouhi.adapter.InvoiceAdapter;
-import com.dl.smartshouhi.model.InvoiceModel;
+import com.dl.smartshouhi.api.InvoiceDbApi;
+import com.dl.smartshouhi.model.Invoice;
 import com.google.gson.Gson;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 import static com.dl.smartshouhi.constaint.Constant.ID_KEY;
 import static com.dl.smartshouhi.constaint.Constant.SHARED_PREFS;
-import static com.dl.smartshouhi.constaint.Constant.URL_GET_INVOICE_BY_USER_ID;
-import static com.dl.smartshouhi.constaint.Constant.URL_UPDATE_A_INVOICE;
+import static com.dl.smartshouhi.constaint.Constant.SHARED_PREFS_API;
 
 public class HistoryFragment extends Fragment {
 
@@ -54,12 +55,12 @@ public class HistoryFragment extends Fragment {
     private RecyclerView rcvInvoices;
 
     private EditText edtUpdateSeller, edtUpdateAddress, edtUpdateTotalCost, edtUpdateTimestamp;
-    private Button btnCancelUpdate;
     private Dialog dialogUpdate;
-    private ImageButton imgButtonCalendar;
 
-    private List<InvoiceModel> invoiceList;
-    private RequestQueue requestQueue;
+    private Dialog dialogDelete;
+
+    private List<Invoice> invoiceList;
+    private SharedPreferences sharedPreferences ;
 
     @Nullable
     @Override
@@ -85,16 +86,28 @@ public class HistoryFragment extends Fragment {
                 DividerItemDecoration.VERTICAL);
         rcvInvoices.addItemDecoration(dividerItemDecoration);
 
-        requestQueue = Volley.newRequestQueue(getActivity());
+
+        sharedPreferences = this.getActivity().getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
 
     }
 
     private void initRecycleView(){
-        InvoiceAdapter invoiceAdapter = new InvoiceAdapter(invoiceList, (invoice, position) -> openDialogUpdateItem(invoice, position));
+
+        InvoiceAdapter invoiceAdapter = new InvoiceAdapter(invoiceList, new InvoiceAdapter.IClickListener() {
+            @Override
+            public void onClickUpdateItem(Invoice invoice, int position) {
+                openDialogUpdateItem(invoice, position);
+            }
+
+            @Override
+            public void onClickDeleteItem(Invoice invoice, int position) {
+                openDialogDeleteItem(invoice, position);
+            }
+        });
         rcvInvoices.setAdapter(invoiceAdapter);
     }
 
-    private void openDialogUpdateItem(InvoiceModel invoice, int position){
+    private void openDialogUpdateItem(Invoice invoice, int position){
         dialogUpdate = new Dialog(getActivity());
         dialogUpdate.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialogUpdate.setContentView(R.layout.layout_dialog_update_item_invoice);
@@ -107,9 +120,9 @@ public class HistoryFragment extends Fragment {
         edtUpdateAddress = dialogUpdate.findViewById(R.id.edt_update_address);
         edtUpdateTotalCost = dialogUpdate.findViewById(R.id.edt_update_total_cost);
         edtUpdateTimestamp = dialogUpdate.findViewById(R.id.edt_update_timestamp);
-        btnCancelUpdate = dialogUpdate.findViewById(R.id.btn_cancel_update);
+        Button btnCancelUpdate = dialogUpdate.findViewById(R.id.btn_cancel_update);
         Button btnUpdate = dialogUpdate.findViewById(R.id.btn_update);
-        imgButtonCalendar = dialogUpdate.findViewById(R.id.btn_calendar_invoice);
+        ImageButton imgButtonCalendar = dialogUpdate.findViewById(R.id.btn_calendar_invoice);
 
         edtUpdateSeller.setText(invoice.getSeller());
         edtUpdateAddress.setText(invoice.getAddress());
@@ -118,108 +131,147 @@ public class HistoryFragment extends Fragment {
 
         btnCancelUpdate.setOnClickListener(v -> dialogUpdate.dismiss());
 
-        btnUpdate.setOnClickListener(v -> {
-            updateItem(invoice, position);
-        });
+        btnUpdate.setOnClickListener(v -> updateItem(invoice));
 
         imgButtonCalendar.setOnClickListener(v -> displayCalendar());
 
         dialogUpdate.show();
     }
 
-    private void updateItem(InvoiceModel invoice, int postion){
+    private void openDialogDeleteItem(Invoice invoice, int position){
+        dialogDelete = new Dialog(getActivity());
+        dialogDelete.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialogDelete.setContentView(R.layout.layout_dialog_delete_item_invoice);
+        Window window = dialogDelete.getWindow();
+        window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
+        window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        dialogDelete.setCancelable(false);
 
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, URL_UPDATE_A_INVOICE, new com.android.volley.Response.Listener<String>() {
+        Button btnCancelDelete = dialogDelete.findViewById(R.id.btn_cancel_delete);
+        Button btnDelete = dialogDelete.findViewById(R.id.btn_delete);
+
+
+        btnCancelDelete.setOnClickListener(v -> dialogDelete.dismiss());
+
+        btnDelete.setOnClickListener(v -> {
+            deleteItem(invoice);
+        });
+
+        dialogDelete.show();
+    }
+
+    private void updateItem(Invoice invoice){
+
+        String seller = edtUpdateSeller.getText().toString().trim();
+        String address = edtUpdateAddress.getText().toString().trim();
+        String timestamp = edtUpdateTimestamp.getText().toString().trim();
+        String totalCost = edtUpdateTotalCost.getText().toString().trim();
+        int id = invoice.getId();
+
+        InvoiceDbApi.databaseApi.updateInvoice(id, seller, address, totalCost, timestamp).enqueue(new Callback<ResponseBody>() {
             @Override
-            public void onResponse(String response) {
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                String strResult;
+                try {
+                    strResult = response.body().string();
+                    if(strResult.length() > 1){
 
-                response = response.substring(1, response.length()-1);
-                String[] listResult = response.split("#");
-                if(listResult[0].equals("200")){
-
-                    Toast.makeText(getActivity(), listResult[1], Toast.LENGTH_SHORT).show();
-                    dialogUpdate.dismiss();
-                    processingData();
-                }else {
-                    Toast.makeText(getActivity(), listResult[1], Toast.LENGTH_SHORT).show();
-                    dialogUpdate.dismiss();
+                        String[] listResult = strResult.split("#");
+                        if(listResult[0].equals("200")) {
+                            Toast.makeText(getActivity(), listResult[1], Toast.LENGTH_SHORT).show();
+                            dialogUpdate.dismiss();
+                            processingData();
+                        }else {
+                            Toast.makeText(getActivity(), listResult[1], Toast.LENGTH_LONG).show();
+                            dialogUpdate.dismiss();
+                        }
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
-
             }
-        }, error -> {
-            Toast.makeText(getActivity(), "Error 500", Toast.LENGTH_SHORT).show();
-            dialogUpdate.dismiss();
-        }){
+
             @Override
-            protected Map<String, String> getParams() {
-                Map<String,String> params = new HashMap<>();
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
 
-                String seller = edtUpdateSeller.getText().toString().trim();
-                String address = edtUpdateAddress.getText().toString().trim();
-                String timestamp = edtUpdateTimestamp.getText().toString().trim();
-                String totalCost = edtUpdateTotalCost.getText().toString().trim();
-                int id = invoice.getId();
-
-                params.put("seller", seller);
-                params.put("address", address);
-                params.put("timestamp", timestamp);
-                params.put("totalcost", totalCost);
-                params.put("invoiceId", String.valueOf(id));
-                return params;
             }
-        };
+        });
 
-        requestQueue.add(stringRequest);
+    }
+
+    private void deleteItem(Invoice invoice){
+
+        InvoiceDbApi.databaseApi.deleteInvoice(invoice.getId()).enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                String strResult;
+                try {
+                    strResult = response.body().string();
+                    if(strResult.length() > 1){
+
+                        String[] listResult = strResult.split("#");
+                        if(listResult[0].equals("200")) {
+                            Toast.makeText(getActivity(), listResult[1], Toast.LENGTH_SHORT).show();
+                            dialogDelete.dismiss();
+                            processingData();
+                        }else {
+                            Toast.makeText(getActivity(), listResult[1], Toast.LENGTH_LONG).show();
+                            dialogDelete.dismiss();
+                        }
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+            }
+        });
+
     }
 
 
-
     private void processingData() {
-        SharedPreferences sharedpreferences;
         int userId;
-        RequestQueue requestQueue;
-        requestQueue = Volley.newRequestQueue(getActivity());
-//        invoiceList.clear();
+        sharedPreferences = this.getActivity().getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
 
-        sharedpreferences = this.getActivity().getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
+        userId = sharedPreferences.getInt(ID_KEY, -1);
 
-        // getting data from shared prefs and
-        // storing it in our string variable.
-        userId = sharedpreferences.getInt(ID_KEY, -1);
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, URL_GET_INVOICE_BY_USER_ID+userId, new Response.Listener<String>() {
+        InvoiceDbApi.databaseApi.getListInvoice(userId).enqueue(new Callback<ResponseBody>() {
             @Override
-            public void onResponse(String response) {
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                String strResult;
+                try {
+                    strResult = response.body().string();
+                    if(strResult.length() > 1){
+                        strResult = strResult.replace("\\", "");
+                        strResult = strResult.replace("\"{", "{");
+                        strResult = strResult.replace("}\"", "}");
+                        strResult = strResult.substring(1, strResult.length() - 1);
 
-                response = response.replace("\\", "");
-                response = response.replace("\"{", "{");
-                response = response.replace("}\"", "}");
-                response = response.substring(1, response.length() - 1);
+                        Gson gson = new Gson();
 
-                Gson gson = new Gson();
-
-//                String result = gson.fromJson(response, String.class);
-                String[] listResult = response.split("#");
-                if(listResult[0].equals("200")) {
-                    invoiceList = Arrays.asList(gson.fromJson(listResult[1], InvoiceModel[].class));
-                    initRecycleView();
-                }else {
-                    Toast.makeText(getActivity(), listResult[1], Toast.LENGTH_LONG);
+                        String[] listResult = strResult.split("#");
+                        if(listResult[0].equals("200")) {
+                            invoiceList = Arrays.asList(gson.fromJson(listResult[1], Invoice[].class));
+                            initRecycleView();
+                        }else {
+                            Toast.makeText(getActivity(), listResult[1], Toast.LENGTH_LONG).show();
+                        }
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
 
-
             }
-        }, error -> {
-            Toast.makeText(getActivity(), "error", Toast.LENGTH_LONG);
-        }){
+
             @Override
-            protected Map<String, String> getParams() {
-                Map<String,String> params = new HashMap<>();
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
 
-                return params;
             }
-        };
-
-        requestQueue.add(stringRequest);
+        });
 
     }
 
@@ -242,4 +294,5 @@ public class HistoryFragment extends Fragment {
         alertDialog.setView(dialogView);
         alertDialog.show();
     }
+
 }
